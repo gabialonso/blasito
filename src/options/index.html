@@ -8,17 +8,13 @@
   </head>
   <body>
     <header class="topbar">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">B</span>
-        <div><strong>Blasito</strong><span>Tus textos quedan en este navegador</span></div>
-      </div>
-      <span class="local-badge">Guardado local</span>
+      <strong>Blasito</strong>
     </header>
 
     <main class="options-layout">
       <section class="panel editor-panel" aria-labelledby="editor-title">
         <div class="section-heading">
-          <div><p class="eyebrow">Crear</p><h1 id="editor-title">Nuevo atajo</h1></div>
+          <h1 id="editor-title">Nuevo atajo</h1>
         </div>
         <form id="snippet-form">
           <label>Nombre <span class="optional">Para reconocerlo; es opcional</span><input id="name" name="name" autocomplete="off" placeholder="Respuesta de bienvenida" /></label>
@@ -32,17 +28,20 @@
         </form>
 
         <section class="import-panel" aria-labelledby="import-title">
-          <p class="eyebrow">Migrar</p>
           <h2 id="import-title">Importar varios atajos</h2>
           <p>Elegí un archivo JSON con una lista de atajos. Los repetidos se saltean.</p>
-          <label class="file-input">Archivo JSON<input id="import-file" type="file" accept="application/json,.json" /></label>
+          <label class="file-input">
+            <span>Archivo JSON</span>
+            <input id="import-file" type="file" accept="application/json,.json" />
+            <span class="button secondary">Elegir archivo</span>
+          </label>
           <p id="import-status" class="status" role="status" aria-live="polite"></p>
         </section>
       </section>
 
       <section class="panel list-panel" aria-labelledby="list-title">
         <div class="section-heading list-heading">
-          <div><p class="eyebrow">Guardados</p><h2 id="list-title">Tus atajos</h2></div>
+          <h2 id="list-title">Tus atajos</h2>
           <span id="snippet-count" class="count">0</span>
         </div>
         <label class="search-field"><span class="sr-only">Buscar atajos</span><input id="search" type="search" placeholder="Buscar por nombre, atajo o texto" /></label>

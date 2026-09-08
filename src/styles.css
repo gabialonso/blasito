@@ -1,41 +1,35 @@
 @font-face {
-  font-family: "Raleway";
+  font-family: "Railway";
   src: url("./assets/raleway-latin.woff2") format("woff2");
   font-style: normal;
   font-weight: 100 900;
-  font-display: swap;
+  font-display: block;
 }
 
 :root {
   color: #202826;
   background: #f5f3ec;
-  font: 15px/1.45 "Raleway", Arial, sans-serif;
+  font: 15px/1.45 "Railway";
   color-scheme: light;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; font-family: "Railway" !important; }
 body { min-width: 20rem; min-height: 100vh; margin: 0; background: #f5f3ec; }
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
 button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgb(0 143 131 / 25%); outline-offset: 2px; }
 
-.topbar { display: flex; align-items: center; justify-content: space-between; min-height: 4.5rem; padding: .75rem max(1.25rem, calc((100vw - 72rem) / 2)); color: #fff; background: #006c67; border-bottom: 4px solid #008f83; }
-.brand { display: flex; align-items: center; gap: .75rem; }
-.brand-mark { display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: .4rem; color: #006c67; background: #fff; font-size: 1.05rem; font-weight: 800; }
-.brand strong, .brand span { display: block; }
-.brand strong { font-size: 1.1rem; font-weight: 750; letter-spacing: -.01em; }
-.brand div > span { color: #d4efed; font-size: .78rem; }
-.local-badge, .count, .shortcut { border-radius: .35rem; font-weight: 700; }
-.local-badge { padding: .35rem .65rem; border: 1px solid rgb(255 255 255 / 30%); color: #fff; font-size: .75rem; }
+.topbar { display: flex; align-items: center; min-height: 4.5rem; padding: .75rem max(1.25rem, calc((100vw - 72rem) / 2)); color: #fff; background: #006c67; border-bottom: 4px solid #008f83; }
+.topbar > strong, .popup-header > strong { font-size: 1.1rem; font-weight: 750; letter-spacing: -.01em; }
+.count, .shortcut { border-radius: .35rem; font-weight: 700; }
 
 .options-layout { display: grid; grid-template-columns: minmax(20rem, 25rem) minmax(24rem, 1fr); gap: 1.25rem; width: min(72rem, calc(100% - 2.5rem)); margin: 2rem auto; align-items: start; }
 .panel { border: 1px solid #dcded8; border-radius: .65rem; background: #fff; box-shadow: 0 5px 16px rgb(44 57 54 / 8%); }
 .editor-panel, .list-panel { padding: 1.5rem; }
 .editor-panel { position: sticky; top: 1.25rem; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
-.section-heading h1, .section-heading h2, .eyebrow { margin: 0; }
+.section-heading h1, .section-heading h2 { margin: 0; }
 .section-heading h1, .section-heading h2 { font-size: 1.6rem; line-height: 1.2; letter-spacing: -.025em; }
-.eyebrow { margin-bottom: .25rem; color: #007c73; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .count { min-width: 2rem; padding: .3rem .6rem; color: #006c67; background: #d8f1ef; text-align: center; }
 
 form, label { display: grid; gap: .4rem; }
@@ -55,8 +49,11 @@ textarea { min-height: 10rem; resize: vertical; }
 .search-field { margin-bottom: .9rem; }
 .import-panel { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #dfe2dc; }
 .import-panel h2 { margin: 0; font-size: 1.05rem; }
-.import-panel > p:not(.eyebrow, .status) { margin: .4rem 0 .8rem; color: #5f6d69; font-size: .84rem; }
-.file-input input { padding: .5rem; }
+.import-panel > p:not(.status) { margin: .4rem 0 .8rem; color: #5f6d69; font-size: .84rem; }
+.file-input { justify-items: start; }
+.file-input .button { display: inline-flex; align-items: center; }
+.file-input input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.file-input input:focus-visible + .button { outline: 3px solid rgb(0 143 131 / 25%); outline-offset: 2px; }
 
 .snippet-list { display: grid; gap: .65rem; margin: 0; padding: 0; list-style: none; }
 .snippet-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid #dfe2dc; border-radius: .45rem; background: #fff; }
@@ -76,9 +73,7 @@ textarea { min-height: 10rem; resize: vertical; }
 [hidden] { display: none !important; }
 
 .popup { width: 24rem; min-height: 27rem; background: #f5f3ec; }
-.popup-header { display: flex; align-items: center; justify-content: space-between; min-height: 4rem; padding: .75rem 1rem; color: #fff; background: #006c67; border-bottom: 3px solid #008f83; }
-.popup-header .brand-mark { width: 2rem; height: 2rem; font-size: .9rem; }
-.popup-header .count { border: 1px solid rgb(255 255 255 / 22%); color: #fff; background: rgb(255 255 255 / 12%); }
+.popup-header { display: flex; align-items: center; min-height: 4rem; padding: .75rem 1rem; color: #fff; background: #006c67; border-bottom: 3px solid #008f83; }
 .popup-main { padding: 1rem; }
 .popup-main .search-field { margin: 0; }
 .popup-list { max-height: 18rem; overflow: auto; }
@@ -89,7 +84,6 @@ textarea { min-height: 10rem; resize: vertical; }
 
 @media (max-width: 760px) {
   .topbar { min-height: 4rem; }
-  .brand div > span, .local-badge { display: none; }
   .options-layout { grid-template-columns: 1fr; width: min(100% - 1.25rem, 42rem); margin: .75rem auto; }
   .editor-panel { position: static; }
   .snippet-card { display: grid; }

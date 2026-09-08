@@ -82,4 +82,4 @@ src/snippets/        modelo, expansión y almacenamiento
 tests/               pruebas de la lógica
 ```
 
-La interfaz usa Raleway, distribuida bajo la SIL Open Font License. La licencia está junto al archivo de la fuente en `src/assets/`.
+La fuente de la interfaz está incluida dentro del build. Su licencia está junto al archivo en `src/assets/`.

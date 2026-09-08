@@ -5,7 +5,6 @@ import { getSnippets, STORAGE_KEY } from "../snippets/storage";
 const searchInput = requiredElement<HTMLInputElement>("#search");
 const list = requiredElement<HTMLUListElement>("#snippet-list");
 const emptyState = requiredElement<HTMLElement>("#empty-state");
-const count = requiredElement<HTMLElement>("#snippet-count");
 const status = requiredElement<HTMLElement>("#popup-status");
 let snippets: Snippet[] = [];
 
@@ -35,7 +34,6 @@ async function loadSnippets(): Promise<void> {
 function renderSnippets(): void {
   const visibleSnippets = filterSnippets(snippets, searchInput.value);
   list.replaceChildren(...visibleSnippets.map(renderSnippet));
-  count.textContent = String(snippets.length);
   status.textContent = "";
   emptyState.hidden = visibleSnippets.length > 0;
   emptyState.querySelector("strong")!.textContent = snippets.length ? "No encontramos ese atajo" : "Todavía no guardaste atajos";
