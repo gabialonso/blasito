@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="../ui.css" />
   </head>
   <body class="popup">
-    <main>
-      <h1>Blasito</h1>
-      <p>Todavía no hay snippets.</p>
-      <button id="open-options" type="button">Administrar snippets</button>
+    <header class="popup-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">B</span><strong>Blasito</strong></div>
+      <span id="snippet-count" class="count">0</span>
+    </header>
+    <main class="popup-main">
+      <label class="search-field"><span class="sr-only">Buscar snippets</span><input id="search" type="search" placeholder="Buscar snippets" /></label>
+      <p id="popup-status" class="status" role="status" aria-live="polite"></p>
+      <ul id="snippet-list" class="snippet-list popup-list"></ul>
+      <div id="empty-state" class="empty-state"><strong>No hay snippets todavía</strong><span>Creá el primero para empezar.</span></div>
     </main>
+    <footer class="popup-footer"><button id="open-options" class="button primary" type="button">Administrar snippets</button></footer>
     <script type="module" src="./index.ts"></script>
   </body>
 </html>
