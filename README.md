@@ -35,9 +35,9 @@ Esto genera `blasito.zip` en la carpeta del proyecto. El archivo ya contiene ún
 1. Abrí Blasito y elegí **Crear o editar atajos**.
 2. Guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar.
 3. Escribí `/hola` en un `input` o `textarea` de una página normal.
-4. Presioná Espacio, Enter o Tab.
+4. Al terminar de escribir el atajo, Blasito lo reemplaza automáticamente.
 
-Blasito reemplaza el atajo y deja el cursor al final del texto insertado. La tecla que dispara el reemplazo no se agrega al resultado.
+Blasito deja el cursor al final del texto insertado.
 
 ## Importar varios atajos
 

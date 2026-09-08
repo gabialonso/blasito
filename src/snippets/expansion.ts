@@ -6,10 +6,6 @@ export interface Expansion {
   content: string;
 }
 
-export function isTriggerKey(key: string): boolean {
-  return key === " " || key === "Enter" || key === "Tab";
-}
-
 export function findExpansion(value: string, cursor: number, snippets: Snippet[]): Expansion | undefined {
   for (const snippet of snippets) {
     const start = cursor - snippet.shortcut.length;

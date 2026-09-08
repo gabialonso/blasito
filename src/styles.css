@@ -58,11 +58,11 @@ textarea { min-height: 10rem; resize: vertical; }
 .file-input input:focus-visible + .button { outline: 3px solid rgb(0 143 131 / 25%); outline-offset: 2px; }
 
 .snippet-list { display: grid; gap: .65rem; margin: 0; padding: 0; list-style: none; }
-.snippet-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid #dfe2dc; border-radius: .45rem; background: #fff; }
+.snippet-card { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid #dfe2dc; border-radius: .45rem; background: #fff; }
 .snippet-copy { min-width: 0; }
 .snippet-heading { display: flex; align-items: center; gap: .6rem; }
 .shortcut { flex: none; padding: .22rem .5rem; color: #006c67; background: #d8f1ef; font-size: .8rem; }
-.snippet-card p { display: -webkit-box; overflow: hidden; margin: .5rem 0 0; color: #5f6d69; font-size: .88rem; white-space: pre-line; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.snippet-card p { display: -webkit-box; overflow: hidden; overflow-wrap: anywhere; margin: .5rem 0 0; color: #5f6d69; font-size: .88rem; white-space: pre-line; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .text-button { padding: .25rem; border: 0; color: #006c67; background: transparent; font-size: .82rem; font-weight: 750; }
 .text-button:hover { color: #008f83; text-decoration: underline; }
 .text-button.danger, .status[data-kind="error"] { color: #b42318; }

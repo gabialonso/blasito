@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { findExpansion, isTriggerKey } from "../src/snippets/expansion";
+import { findExpansion } from "../src/snippets/expansion";
 import type { Snippet } from "../src/snippets/types";
 
 const hello: Snippet = {
@@ -11,16 +11,6 @@ const hello: Snippet = {
   createdAt: "2026-09-08T10:00:00.000Z",
   updatedAt: "2026-09-08T10:00:00.000Z",
 };
-
-describe("isTriggerKey", () => {
-  it.each([" ", "Enter", "Tab"])("acepta %j como delimitador", (key) => {
-    expect(isTriggerKey(key)).toBe(true);
-  });
-
-  it("rechaza otras teclas", () => {
-    expect(isTriggerKey("a")).toBe(false);
-  });
-});
 
 describe("findExpansion", () => {
   it("encuentra un shortcut completo antes del cursor", () => {
