@@ -12,3 +12,10 @@ export interface SnippetDraft {
   shortcut: string;
   content: string;
 }
+
+export interface ImportResult {
+  snippets: Snippet[];
+  imported: number;
+  duplicates: number;
+  invalid: number;
+}

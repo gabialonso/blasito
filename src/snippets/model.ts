@@ -1,4 +1,4 @@
-import type { Snippet, SnippetDraft } from "./types";
+import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
 export function validateDraft(draft: SnippetDraft, snippets: Snippet[], currentId?: string): SnippetDraft {
   const shortcut = draft.shortcut.trim();
@@ -68,6 +68,62 @@ export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
     [snippet.name, snippet.shortcut, snippet.content].some((value) =>
       value?.toLocaleLowerCase().includes(normalizedQuery),
     ),
+  );
+}
+
+export function prepareImport(
+  value: unknown,
+  existing: Snippet[],
+  createId: () => string = () => crypto.randomUUID(),
+  timestamp = new Date().toISOString(),
+): ImportResult {
+  const entries = importEntries(value);
+  const snippets = [...existing];
+  let imported = 0;
+  let duplicates = 0;
+  let invalid = 0;
+
+  for (const entry of entries) {
+    if (!isImportEntry(entry) || !entry.shortcut.trim()) {
+      invalid++;
+      continue;
+    }
+
+    const shortcut = entry.shortcut.trim();
+    if (snippets.some((snippet) => snippet.shortcut === shortcut)) {
+      duplicates++;
+      continue;
+    }
+
+    snippets.push(createSnippet(entry, snippets, createId(), timestamp));
+    imported++;
+  }
+
+  return { snippets, imported, duplicates, invalid };
+}
+
+function importEntries(value: unknown): unknown[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (value && typeof value === "object" && Array.isArray((value as Record<string, unknown>).snippets)) {
+    return (value as Record<string, unknown>).snippets as unknown[];
+  }
+
+  throw new Error("El archivo debe contener una lista de atajos.");
+}
+
+function isImportEntry(value: unknown): value is SnippetDraft {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const entry = value as Record<string, unknown>;
+  return (
+    typeof entry.shortcut === "string" &&
+    typeof entry.content === "string" &&
+    (entry.name === undefined || typeof entry.name === "string")
   );
 }
 

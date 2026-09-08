@@ -1,6 +1,6 @@
 import { filterSnippets } from "../snippets/model";
-import type { Snippet, SnippetDraft } from "../snippets/types";
-import { addSnippet, deleteSnippet, editSnippet, getSnippets } from "../snippets/storage";
+import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
+import { addSnippet, deleteSnippet, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
 
 const form = requiredElement<HTMLFormElement>("#snippet-form");
 const nameInput = requiredElement<HTMLInputElement>("#name");
@@ -15,6 +15,8 @@ const submitLabel = requiredElement<HTMLElement>("#submit-label");
 const cancelButton = requiredElement<HTMLButtonElement>("#cancel-edit");
 const formStatus = requiredElement<HTMLElement>("#form-status");
 const listStatus = requiredElement<HTMLElement>("#list-status");
+const importInput = requiredElement<HTMLInputElement>("#import-file");
+const importStatus = requiredElement<HTMLElement>("#import-status");
 
 let snippets: Snippet[] = [];
 let editingId: string | undefined;
@@ -25,6 +27,7 @@ form.addEventListener("submit", (event) => {
 });
 cancelButton.addEventListener("click", () => resetForm());
 searchInput.addEventListener("input", renderSnippets);
+importInput.addEventListener("change", () => void importFile());
 void loadSnippets();
 
 async function loadSnippets(): Promise<void> {
@@ -127,6 +130,22 @@ async function removeSnippet(snippet: Snippet): Promise<void> {
   }
 }
 
+async function importFile(): Promise<void> {
+  const [file] = importInput.files ?? [];
+  if (!file) return;
+
+  try {
+    const result = await importSnippets(JSON.parse(await file.text()) as unknown);
+    importStatus.textContent = importMessage(result);
+    importStatus.dataset.kind = "success";
+    importInput.value = "";
+    await loadSnippets();
+  } catch (error: unknown) {
+    importStatus.textContent = error instanceof SyntaxError ? "El archivo no contiene JSON válido." : messageFrom(error);
+    importStatus.dataset.kind = "error";
+  }
+}
+
 function resetForm(clearStatus = true): void {
   editingId = undefined;
   form.reset();
@@ -139,6 +158,15 @@ function resetForm(clearStatus = true): void {
 function showFormStatus(message: string, isError = false): void {
   formStatus.textContent = message;
   formStatus.dataset.kind = isError ? "error" : "success";
+}
+
+function importMessage({ imported, duplicates, invalid }: ImportResult): string {
+  const details = [
+    `${imported} ${imported === 1 ? "atajo importado" : "atajos importados"}`,
+    ...(duplicates ? [`${duplicates} repetido${duplicates === 1 ? "" : "s"}`] : []),
+    ...(invalid ? [`${invalid} inválido${invalid === 1 ? "" : "s"}`] : []),
+  ];
+  return `${details.join(", ")}.`;
 }
 
 function messageFrom(error: unknown): string {

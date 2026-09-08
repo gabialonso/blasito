@@ -31,15 +31,37 @@ Si modificás el código, volvé a ejecutar `npm run build` y recargá Blasito d
 
 Blasito reemplaza el atajo y deja el cursor al final del texto insertado. La tecla que dispara el reemplazo no se agrega al resultado.
 
+## Importar varios atajos
+
+En **Crear o editar atajos**, elegí un archivo JSON. Podés armarlo a mano como una lista:
+
+```json
+[
+  {
+    "name": "Saludo",
+    "shortcut": "/hola",
+    "content": "Hola, ¿cómo estás?"
+  },
+  {
+    "shortcut": "/firma",
+    "content": "Saludos."
+  }
+]
+```
+
+También se acepta el mismo arreglo dentro de una propiedad `snippets`. El nombre es opcional; `shortcut` y `content` son obligatorios. Si un archivo no es válido, Blasito no cambia lo que ya tenías. Los atajos repetidos se saltean y la pantalla te informa el resultado.
+
 ## Qué incluye este MVP
 
 - Crear, editar, eliminar y buscar atajos.
 - Buscar los textos guardados desde el popup.
 - Evitar atajos vacíos o repetidos.
+- Importar varios atajos desde JSON.
 - Expandir atajos en `input[type="text"]` y `textarea`.
+- Reproducir un tono breve al insertar un atajo.
 - Conservar los datos al cerrar el navegador.
 
-Todavía no incluye `contenteditable`, importación y exportación, ni integración especial con editores como Monaco o CodeMirror.
+Todavía no incluye `contenteditable`, exportación, ni integración especial con editores como Monaco o CodeMirror.
 
 ## Desarrollo
 

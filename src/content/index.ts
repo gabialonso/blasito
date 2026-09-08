@@ -2,6 +2,7 @@ import { findExpansion, isTriggerKey } from "../snippets/expansion";
 import { parseStoredSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, STORAGE_KEY } from "../snippets/storage";
+import { playExpansionSound } from "./sound";
 
 let snippets: Snippet[] = [];
 
@@ -42,6 +43,7 @@ document.addEventListener("keydown", (event) => {
 
   event.preventDefault();
   field.setRangeText(expansion.content, expansion.start, expansion.end, "end");
+  playExpansionSound();
   field.dispatchEvent(
     new InputEvent("input", {
       bubbles: true,

@@ -1,5 +1,5 @@
-import { createSnippet, parseStoredSnippets, updateSnippet } from "./model";
-import type { Snippet, SnippetDraft } from "./types";
+import { createSnippet, parseStoredSnippets, prepareImport, updateSnippet } from "./model";
+import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
 export const STORAGE_KEY = "snippets";
 
@@ -30,6 +30,14 @@ export async function editSnippet(id: string, draft: SnippetDraft): Promise<Snip
 export async function deleteSnippet(id: string): Promise<void> {
   const snippets = await getSnippets();
   await saveSnippets(snippets.filter((snippet) => snippet.id !== id));
+}
+
+export async function importSnippets(value: unknown): Promise<ImportResult> {
+  const result = prepareImport(value, await getSnippets());
+  if (result.imported) {
+    await saveSnippets(result.snippets);
+  }
+  return result;
 }
 
 function saveSnippets(snippets: Snippet[]): Promise<void> {
