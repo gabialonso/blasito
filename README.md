@@ -34,7 +34,7 @@ Esto genera `blasito.zip` en la carpeta del proyecto. El archivo ya contiene ún
 
 1. Abrí Blasito y elegí **Crear o editar atajos**.
 2. Guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar.
-3. Escribí `/hola` en un `input` o `textarea` de una página normal.
+3. Escribí `/hola` en un campo de texto o editor web.
 4. Al terminar de escribir el atajo, Blasito lo reemplaza automáticamente.
 
 Blasito deja el cursor al final del texto insertado.
@@ -65,11 +65,11 @@ También se acepta el mismo arreglo dentro de una propiedad `snippets`. El nombr
 - Buscar los textos guardados desde el popup.
 - Evitar atajos vacíos o repetidos.
 - Importar varios atajos desde JSON.
-- Expandir atajos en `input[type="text"]` y `textarea`.
+- Expandir atajos en campos de texto y editores `contenteditable`.
 - Reproducir un tono breve al insertar un atajo.
 - Conservar los datos al cerrar el navegador.
 
-Todavía no incluye `contenteditable`, exportación, ni integración especial con editores como Monaco o CodeMirror.
+Todavía no incluye exportación ni integración especial con editores como Monaco o CodeMirror.
 
 ## Desarrollo
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { expandTextControl } from "../src/content/expand";
+import { expandTextControl, locateTextOffset } from "../src/content/expand";
 import type { Snippet } from "../src/snippets/types";
 
 const snippet: Snippet = {
@@ -30,5 +30,11 @@ describe("expandTextControl", () => {
     expect(expandTextControl(field, [snippet])).toBe("Texto insertado");
     expect(field.value).toBe("Texto insertado");
     expect(field.selectionStart).toBe(15);
+  });
+});
+
+describe("locateTextOffset", () => {
+  it("ubica el comienzo de un atajo dividido entre elementos anidados", () => {
+    expect(locateTextOffset(["Hola ", "/tm", "ant"], 5)).toEqual({ nodeIndex: 0, offset: 5 });
   });
 });
