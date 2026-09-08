@@ -42,6 +42,8 @@ input:hover, textarea:hover { border-color: #849b95; }
 input:focus, textarea:focus { border-color: #008f83; box-shadow: 0 0 0 3px rgb(0 143 131 / 10%); outline: 0; }
 textarea { min-height: 10rem; resize: vertical; }
 .form-actions, .card-actions { display: flex; gap: .65rem; }
+.button, .text-button { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; }
+.feather { width: 1rem; height: 1rem; flex: none; }
 .button { min-height: 2.6rem; border: 1px solid transparent; border-radius: .4rem; padding: .65rem 1rem; font-weight: 750; }
 .button.primary { color: #fff; background: #008f83; }
 .button.primary:hover { background: #006c67; }

@@ -21,6 +21,11 @@ const importStatus = requiredElement<HTMLElement>("#import-status");
 let snippets: Snippet[] = [];
 let editingId: string | undefined;
 
+const actionIcons = {
+  edit: '<svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+  trash: '<svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+} as const;
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   void saveForm();
@@ -88,18 +93,19 @@ function renderSnippet(snippet: Snippet): HTMLLIElement {
   preview.textContent = snippet.content;
   const actions = document.createElement("div");
   actions.className = "card-actions";
-  actions.append(actionButton("Editar", () => startEditing(snippet)), actionButton("Eliminar", () => void removeSnippet(snippet), "danger"));
+  actions.append(actionButton("Editar", "edit", () => startEditing(snippet)), actionButton("Eliminar", "trash", () => void removeSnippet(snippet), "danger"));
   heading.append(shortcut, name);
   copy.append(heading, preview);
   item.append(copy, actions);
   return item;
 }
 
-function actionButton(label: string, action: () => void, className = ""): HTMLButtonElement {
+function actionButton(label: string, icon: keyof typeof actionIcons, action: () => void, className = ""): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = `text-button ${className}`.trim();
-  button.textContent = label;
+  button.insertAdjacentHTML("afterbegin", actionIcons[icon]);
+  button.append(label);
   button.addEventListener("click", action);
   return button;
 }
