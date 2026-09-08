@@ -55,12 +55,9 @@ La lógica de validación y expansión está separada de Chrome y se prueba en `
 
 ```text
 public/              manifest.json
-src/content/         detección y expansión en páginas
+src/content/         conexión con los campos de las páginas
 src/options/         administración de snippets
 src/popup/           buscador rápido
-src/snippets/        tipos y reglas puras
-src/storage/         acceso a chrome.storage.local
+src/snippets/        modelo, expansión y almacenamiento
 tests/               tests de lógica
 ```
-
-El diseño y los planes de implementación están en `docs/superpowers/`.

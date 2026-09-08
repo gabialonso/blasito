@@ -1,7 +1,7 @@
-import { findExpansion, isTriggerKey } from "./expansion";
-import { parseStoredSnippets } from "../snippets/snippets";
+import { findExpansion, isTriggerKey } from "../snippets/expansion";
+import { parseStoredSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
-import { getSnippets, STORAGE_KEY } from "../storage/snippets";
+import { getSnippets, STORAGE_KEY } from "../snippets/storage";
 
 let snippets: Snippet[] = [];
 

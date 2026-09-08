@@ -1,6 +1,6 @@
-import { filterSnippets, parseStoredSnippets } from "../snippets/snippets";
+import { filterSnippets, parseStoredSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
-import { getSnippets, STORAGE_KEY } from "../storage/snippets";
+import { getSnippets, STORAGE_KEY } from "../snippets/storage";
 
 const searchInput = requiredElement<HTMLInputElement>("#search");
 const list = requiredElement<HTMLUListElement>("#snippet-list");

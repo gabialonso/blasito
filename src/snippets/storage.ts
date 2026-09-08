@@ -1,5 +1,5 @@
-import { createSnippet, parseStoredSnippets, updateSnippet } from "../snippets/snippets";
-import type { Snippet, SnippetDraft } from "../snippets/types";
+import { createSnippet, parseStoredSnippets, updateSnippet } from "./model";
+import type { Snippet, SnippetDraft } from "./types";
 
 export const STORAGE_KEY = "snippets";
 

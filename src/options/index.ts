@@ -1,6 +1,6 @@
-import { filterSnippets } from "../snippets/snippets";
+import { filterSnippets } from "../snippets/model";
 import type { Snippet, SnippetDraft } from "../snippets/types";
-import { addSnippet, deleteSnippet, editSnippet, getSnippets } from "../storage/snippets";
+import { addSnippet, deleteSnippet, editSnippet, getSnippets } from "../snippets/storage";
 
 const form = requiredElement<HTMLFormElement>("#snippet-form");
 const nameInput = requiredElement<HTMLInputElement>("#name");

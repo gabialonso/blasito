@@ -6,7 +6,7 @@ import {
   parseStoredSnippets,
   updateSnippet,
   validateDraft,
-} from "../src/snippets/snippets";
+} from "../src/snippets/model";
 import type { Snippet } from "../src/snippets/types";
 
 const existing: Snippet = {

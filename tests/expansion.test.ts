@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { findExpansion, isTriggerKey } from "../src/content/expansion";
+import { findExpansion, isTriggerKey } from "../src/snippets/expansion";
 import type { Snippet } from "../src/snippets/types";
 
 const hello: Snippet = {

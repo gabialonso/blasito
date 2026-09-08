@@ -1,4 +1,4 @@
-import type { Snippet } from "../snippets/types";
+import type { Snippet } from "./types";
 
 export interface Expansion {
   start: number;
