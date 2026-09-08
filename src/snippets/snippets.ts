@@ -58,6 +58,19 @@ export function parseStoredSnippets(value: unknown): Snippet[] {
   return value;
 }
 
+export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  if (!normalizedQuery) {
+    return snippets;
+  }
+
+  return snippets.filter((snippet) =>
+    [snippet.name, snippet.shortcut, snippet.content].some((value) =>
+      value?.toLocaleLowerCase().includes(normalizedQuery),
+    ),
+  );
+}
+
 function isSnippet(value: unknown): value is Snippet {
   if (!value || typeof value !== "object") {
     return false;

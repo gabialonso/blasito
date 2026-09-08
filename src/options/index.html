@@ -3,13 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Opciones de Blasito</title>
+    <title>Blasito · Snippets</title>
     <link rel="stylesheet" href="../ui.css" />
   </head>
   <body>
-    <main>
-      <h1>Snippets</h1>
-      <p>La administración se agrega en la próxima etapa.</p>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">B</span>
+        <div><strong>Blasito</strong><span>Todo queda en este navegador</span></div>
+      </div>
+      <span class="local-badge">Local</span>
+    </header>
+
+    <main class="options-layout">
+      <section class="panel editor-panel" aria-labelledby="editor-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Editor</p><h1 id="editor-title">Nuevo snippet</h1></div>
+        </div>
+        <form id="snippet-form">
+          <label>Nombre <span class="optional">opcional</span><input id="name" name="name" autocomplete="off" placeholder="Respuesta de bienvenida" /></label>
+          <label>Shortcut<input id="shortcut" name="shortcut" autocomplete="off" placeholder="/hello" required /></label>
+          <label>Contenido<textarea id="content" name="content" rows="9" placeholder="Hola, ¿cómo estás?" required></textarea></label>
+          <p id="form-status" class="status" role="status" aria-live="polite"></p>
+          <div class="form-actions">
+            <button class="button primary" type="submit"><span id="submit-label">Guardar snippet</span></button>
+            <button id="cancel-edit" class="button secondary" type="button" hidden>Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel list-panel" aria-labelledby="list-title">
+        <div class="section-heading list-heading">
+          <div><p class="eyebrow">Biblioteca</p><h2 id="list-title">Tus snippets</h2></div>
+          <span id="snippet-count" class="count">0</span>
+        </div>
+        <label class="search-field"><span class="sr-only">Buscar snippets</span><input id="search" type="search" placeholder="Buscar por nombre, shortcut o contenido" /></label>
+        <p id="list-status" class="status" role="status" aria-live="polite"></p>
+        <ul id="snippet-list" class="snippet-list"></ul>
+        <div id="empty-state" class="empty-state">
+          <strong>No hay snippets todavía</strong><span>Creá el primero desde el formulario.</span>
+        </div>
+      </section>
     </main>
+    <script type="module" src="./index.ts"></script>
   </body>
 </html>

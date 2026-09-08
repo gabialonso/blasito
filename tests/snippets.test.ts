@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   createSnippet,
+  filterSnippets,
   parseStoredSnippets,
   updateSnippet,
   validateDraft,
@@ -95,5 +96,22 @@ describe("parseStoredSnippets", () => {
 
   it("acepta snippets completos", () => {
     expect(parseStoredSnippets([existing])).toEqual([existing]);
+  });
+});
+
+describe("filterSnippets", () => {
+  it("busca sin distinguir mayúsculas en nombre, shortcut y contenido", () => {
+    const other: Snippet = {
+      ...existing,
+      id: "two",
+      name: "Plantilla de bug",
+      shortcut: "/bug",
+      content: "Resultado esperado",
+    };
+
+    expect(filterSnippets([existing, other], "SALUDO")).toEqual([existing]);
+    expect(filterSnippets([existing, other], "/BUG")).toEqual([other]);
+    expect(filterSnippets([existing, other], "esperado")).toEqual([other]);
+    expect(filterSnippets([existing, other], "  ")).toEqual([existing, other]);
   });
 });
