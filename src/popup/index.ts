@@ -38,8 +38,8 @@ function renderSnippets(): void {
   count.textContent = String(snippets.length);
   status.textContent = "";
   emptyState.hidden = visibleSnippets.length > 0;
-  emptyState.querySelector("strong")!.textContent = snippets.length ? "No hay coincidencias" : "No hay snippets todavía";
-  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá el primero para empezar.";
+  emptyState.querySelector("strong")!.textContent = snippets.length ? "No encontramos ese atajo" : "Todavía no guardaste atajos";
+  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá uno para insertar tus textos más rápido.";
 }
 
 function renderSnippet(snippet: Snippet): HTMLLIElement {
@@ -60,7 +60,7 @@ function renderSnippet(snippet: Snippet): HTMLLIElement {
 }
 
 function showError(error: unknown): void {
-  status.textContent = error instanceof Error ? error.message : "No se pudieron cargar los snippets.";
+  status.textContent = error instanceof Error ? error.message : "No pudimos cargar tus atajos.";
   status.dataset.kind = "error";
 }
 

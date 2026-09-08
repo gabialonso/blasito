@@ -3,11 +3,11 @@ import type { Snippet, SnippetDraft } from "./types";
 export function validateDraft(draft: SnippetDraft, snippets: Snippet[], currentId?: string): SnippetDraft {
   const shortcut = draft.shortcut.trim();
   if (!shortcut) {
-    throw new Error("El shortcut no puede estar vacío.");
+    throw new Error("Escribí el atajo que querés usar.");
   }
 
   if (snippets.some((snippet) => snippet.shortcut === shortcut && snippet.id !== currentId)) {
-    throw new Error("Ya existe un snippet con ese shortcut.");
+    throw new Error("Ya guardaste un atajo igual.");
   }
 
   const name = draft.name?.trim();
@@ -52,7 +52,7 @@ export function parseStoredSnippets(value: unknown): Snippet[] {
   }
 
   if (!Array.isArray(value) || !value.every(isSnippet)) {
-    throw new Error("Los snippets guardados no tienen un formato válido.");
+    throw new Error("No pudimos leer los atajos guardados.");
   }
 
   return value;

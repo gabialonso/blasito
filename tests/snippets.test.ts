@@ -34,12 +34,12 @@ describe("validateDraft", () => {
     });
   });
 
-  it("rechaza shortcuts vacíos o duplicados", () => {
+  it("explica con palabras simples los atajos vacíos o repetidos", () => {
     expect(() => validateDraft({ shortcut: "   ", content: "x" }, [])).toThrow(
-      "El shortcut no puede estar vacío.",
+      "Escribí el atajo que querés usar.",
     );
     expect(() => validateDraft({ shortcut: " /hello ", content: "x" }, [existing])).toThrow(
-      "Ya existe un snippet con ese shortcut.",
+      "Ya guardaste un atajo igual.",
     );
   });
 
@@ -90,7 +90,7 @@ describe("parseStoredSnippets", () => {
 
   it("rechaza datos corruptos sin convertirlos silenciosamente", () => {
     expect(() => parseStoredSnippets([{ shortcut: "/sin-id" }])).toThrow(
-      "Los snippets guardados no tienen un formato válido.",
+      "No pudimos leer los atajos guardados.",
     );
   });
 

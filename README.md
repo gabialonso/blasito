@@ -1,47 +1,47 @@
 # Blasito
 
-Blasito es una extensión para Chromium que reemplaza shortcuts por textos guardados. Los snippets se almacenan con `chrome.storage.local`: no hay servidor, cuenta ni telemetría.
+Blasito guarda textos que usás seguido y los inserta cuando escribís un atajo. Por ejemplo, podés guardar una respuesta con el atajo `/hola` y usarla en cualquier campo de texto sin volver a escribirla completa.
 
-## Qué funciona
+Todo se guarda en el navegador con `chrome.storage.local`. No hay cuentas, servidor ni telemetría.
 
-- Crear, editar, borrar y buscar snippets.
-- Ver y buscar snippets desde el popup.
-- Expandir shortcuts en `input[type="text"]` y `textarea`.
-- Usar Espacio, Enter o Tab para disparar la expansión.
-- Conservar los snippets al cerrar y volver a abrir el navegador.
+## Probarlo en Chrome
 
-`contenteditable`, importación/exportación y editores como Monaco o CodeMirror todavía no están incluidos.
-
-## Preparar el proyecto
-
-Necesitás Node.js y npm.
+Necesitás Node.js y npm. Desde la carpeta del proyecto ejecutá:
 
 ```bash
 npm install
 npm run build
 ```
 
-El build queda en `dist/`.
-
-## Cargar la extensión
+Después:
 
 1. Abrí `chrome://extensions`.
-2. Activá el modo desarrollador.
+2. Activá **Modo de desarrollador**.
 3. Elegí **Cargar extensión sin empaquetar**.
 4. Seleccioná la carpeta `dist/`.
 
-Después de modificar el código, ejecutá nuevamente `npm run build` y recargá la extensión desde `chrome://extensions`.
+Si modificás el código, volvé a ejecutar `npm run build` y recargá Blasito desde `chrome://extensions`.
 
-## Probar el flujo principal
+## Cómo se usa
 
-1. Abrí Blasito y entrá en **Administrar snippets**.
-2. Creá un snippet con shortcut `/hello` y el contenido que quieras.
-3. En una página normal, escribí `/hello` dentro de un textarea.
-4. Presioná Espacio, Enter o Tab. El shortcut se reemplaza por el contenido.
+1. Abrí Blasito y elegí **Crear o editar atajos**.
+2. Guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar.
+3. Escribí `/hola` en un `input` o `textarea` de una página normal.
+4. Presioná Espacio, Enter o Tab.
 
-El delimitador se usa para disparar la acción y no se agrega al resultado.
+Blasito reemplaza el atajo y deja el cursor al final del texto insertado. La tecla que dispara el reemplazo no se agrega al resultado.
 
-## Comprobaciones
+## Qué incluye este MVP
+
+- Crear, editar, eliminar y buscar atajos.
+- Buscar los textos guardados desde el popup.
+- Evitar atajos vacíos o repetidos.
+- Expandir atajos en `input[type="text"]` y `textarea`.
+- Conservar los datos al cerrar el navegador.
+
+Todavía no incluye `contenteditable`, importación y exportación, ni integración especial con editores como Monaco o CodeMirror.
+
+## Desarrollo
 
 ```bash
 npm run typecheck
@@ -49,15 +49,15 @@ npm test
 npm run build
 ```
 
-La lógica de validación y expansión está separada de Chrome y se prueba en `tests/`.
-
-## Estructura
+La lógica de validación y reemplazo vive en `src/snippets/` y no depende de Chrome, por eso se puede probar por separado.
 
 ```text
 public/              manifest.json
-src/content/         conexión con los campos de las páginas
-src/options/         administración de snippets
-src/popup/           buscador rápido
+src/content/         integración con los campos de las páginas
+src/options/         pantalla para administrar atajos
+src/popup/           búsqueda rápida
 src/snippets/        modelo, expansión y almacenamiento
-tests/               tests de lógica
+tests/               pruebas de la lógica
 ```
+
+La interfaz usa Raleway, distribuida bajo la SIL Open Font License. La licencia está junto al archivo de la fuente en `src/assets/`.

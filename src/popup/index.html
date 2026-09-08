@@ -9,15 +9,15 @@
   <body class="popup">
     <header class="popup-header">
       <div class="brand"><span class="brand-mark" aria-hidden="true">B</span><strong>Blasito</strong></div>
-      <span id="snippet-count" class="count">0</span>
+      <span id="snippet-count" class="count" aria-label="Atajos guardados">0</span>
     </header>
     <main class="popup-main">
-      <label class="search-field"><span class="sr-only">Buscar snippets</span><input id="search" type="search" placeholder="Buscar snippets" /></label>
+      <label class="search-field"><span class="sr-only">Buscar atajos</span><input id="search" type="search" placeholder="Buscar por nombre o atajo" /></label>
       <p id="popup-status" class="status" role="status" aria-live="polite"></p>
       <ul id="snippet-list" class="snippet-list popup-list"></ul>
-      <div id="empty-state" class="empty-state"><strong>No hay snippets todavía</strong><span>Creá el primero para empezar.</span></div>
+      <div id="empty-state" class="empty-state"><strong>Todavía no guardaste atajos</strong><span>Creá uno para insertar tus textos más rápido.</span></div>
     </main>
-    <footer class="popup-footer"><button id="open-options" class="button primary" type="button">Administrar snippets</button></footer>
+    <footer class="popup-footer"><button id="open-options" class="button primary" type="button">Crear o editar atajos</button></footer>
     <script type="module" src="./index.ts"></script>
   </body>
 </html>

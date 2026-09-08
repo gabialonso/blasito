@@ -48,10 +48,10 @@ async function saveForm(): Promise<void> {
   try {
     if (editingId) {
       await editSnippet(editingId, draft);
-      showFormStatus("Snippet actualizado.");
+      showFormStatus("Cambios guardados.");
     } else {
       await addSnippet(draft);
-      showFormStatus("Snippet guardado.");
+      showFormStatus("Atajo guardado.");
     }
     resetForm(false);
     await loadSnippets();
@@ -65,8 +65,8 @@ function renderSnippets(): void {
   list.replaceChildren(...visibleSnippets.map(renderSnippet));
   count.textContent = String(snippets.length);
   emptyState.hidden = visibleSnippets.length > 0;
-  emptyState.querySelector("strong")!.textContent = snippets.length ? "No hay coincidencias" : "No hay snippets todavía";
-  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá el primero desde el formulario.";
+  emptyState.querySelector("strong")!.textContent = snippets.length ? "No encontramos ese atajo" : "Todavía no guardaste atajos";
+  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá el primero con el formulario.";
 }
 
 function renderSnippet(snippet: Snippet): HTMLLIElement {
@@ -106,7 +106,7 @@ function startEditing(snippet: Snippet): void {
   nameInput.value = snippet.name ?? "";
   shortcutInput.value = snippet.shortcut;
   contentInput.value = snippet.content;
-  editorTitle.textContent = "Editar snippet";
+  editorTitle.textContent = "Editar atajo";
   submitLabel.textContent = "Guardar cambios";
   cancelButton.hidden = false;
   formStatus.textContent = "";
@@ -130,8 +130,8 @@ async function removeSnippet(snippet: Snippet): Promise<void> {
 function resetForm(clearStatus = true): void {
   editingId = undefined;
   form.reset();
-  editorTitle.textContent = "Nuevo snippet";
-  submitLabel.textContent = "Guardar snippet";
+  editorTitle.textContent = "Nuevo atajo";
+  submitLabel.textContent = "Guardar atajo";
   cancelButton.hidden = true;
   if (clearStatus) formStatus.textContent = "";
 }
