@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.content.config.ts",
+    "package": "npm run build && cp src/assets/OFL.txt src/assets/FEATHER-LICENSE.txt dist/ && rm -f blasito.zip && cd dist && zip -qr ../blasito.zip .",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },

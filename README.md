@@ -22,6 +22,14 @@ Después:
 
 Si modificás el código, volvé a ejecutar `npm run build` y recargá Blasito desde `chrome://extensions`.
 
+## Crear el archivo para subir
+
+```bash
+npm run package
+```
+
+Esto genera `blasito.zip` en la carpeta del proyecto. El archivo ya contiene únicamente la extensión compilada y se puede subir directamente a Chrome Web Store.
+
 ## Cómo se usa
 
 1. Abrí Blasito y elegí **Crear o editar atajos**.
