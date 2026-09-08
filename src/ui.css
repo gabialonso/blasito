@@ -1,0 +1,20 @@
+:root {
+  color-scheme: light dark;
+  font: 14px system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  padding: 1rem;
+}
+
+.popup {
+  min-width: 18rem;
+}
+
+button {
+  font: inherit;
+}
