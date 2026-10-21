@@ -6,6 +6,10 @@ export function validateDraft(draft: SnippetDraft, snippets: Snippet[], currentI
     throw new Error("Escribí el atajo que querés usar.");
   }
 
+  if (!draft.content.trim()) {
+    throw new Error("Escribí el contenido que querés guardar.");
+  }
+
   if (snippets.some((snippet) => snippet.shortcut === shortcut && snippet.id !== currentId)) {
     throw new Error("Ya guardaste un atajo igual.");
   }
@@ -84,7 +88,7 @@ export function prepareImport(
   let invalid = 0;
 
   for (const entry of entries) {
-    if (!isImportEntry(entry) || !entry.shortcut.trim()) {
+    if (!isImportEntry(entry) || !entry.shortcut.trim() || !entry.content.trim()) {
       invalid++;
       continue;
     }

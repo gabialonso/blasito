@@ -3,6 +3,7 @@ import type { Snippet } from "../snippets/types";
 import { getSnippets, STORAGE_KEY } from "../snippets/storage";
 import { expandContentEditable, expandTextControl } from "./expand";
 import { playExpansionSound } from "./sound";
+import { supportsInputType } from "./target";
 
 let snippets: Snippet[] = [];
 let replacing = false;
@@ -48,7 +49,7 @@ document.addEventListener("input", (event) => {
 });
 
 function isTextControl(target: EventTarget | null): target is HTMLInputElement | HTMLTextAreaElement {
-  return target instanceof HTMLTextAreaElement || (target instanceof HTMLInputElement && target.type === "text");
+  return target instanceof HTMLTextAreaElement || (target instanceof HTMLInputElement && supportsInputType(target.type));
 }
 
 function contentEditableHost(target: EventTarget | null): HTMLElement | undefined {

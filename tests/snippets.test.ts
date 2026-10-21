@@ -27,26 +27,40 @@ describe("validateDraft", () => {
     });
   });
 
-  it("omite un nombre vacío", () => {
+  it("omite un nombre vacío para conservar atajos sin nombre", () => {
     expect(validateDraft({ name: "  ", shortcut: "/hola", content: "Hola" }, [])).toEqual({
       shortcut: "/hola",
       content: "Hola",
     });
   });
 
-  it("explica con palabras simples los atajos vacíos o repetidos", () => {
-    expect(() => validateDraft({ shortcut: "   ", content: "x" }, [])).toThrow(
+  it("explica con palabras simples los campos vacíos o repetidos", () => {
+    expect(() => validateDraft({ name: "Saludo", shortcut: "   ", content: "x" }, [])).toThrow(
       "Escribí el atajo que querés usar.",
     );
-    expect(() => validateDraft({ shortcut: " /hello ", content: "x" }, [existing])).toThrow(
-      "Ya guardaste un atajo igual.",
+    expect(() => validateDraft({ name: "Saludo", shortcut: "/hola", content: "  " }, [])).toThrow(
+      "Escribí el contenido que querés guardar.",
     );
+    expect(() =>
+      validateDraft({ name: "Saludo", shortcut: " /hello ", content: "x" }, [existing]),
+    ).toThrow("Ya guardaste un atajo igual.");
   });
 
   it("permite conservar el shortcut del snippet editado", () => {
-    expect(validateDraft({ shortcut: "/hello", content: "Nuevo" }, [existing], "one")).toEqual({
+    expect(validateDraft({ name: "Saludo", shortcut: "/hello", content: "Nuevo" }, [existing], "one")).toEqual({
+      name: "Saludo",
       shortcut: "/hello",
       content: "Nuevo",
+    });
+  });
+
+  it("permite nombres repetidos entre distintos atajos", () => {
+    expect(
+      validateDraft({ name: "Saludo", shortcut: "/otro", content: "Hola" }, [existing]),
+    ).toEqual({
+      name: "Saludo",
+      shortcut: "/otro",
+      content: "Hola",
     });
   });
 });
@@ -72,9 +86,15 @@ describe("snippet lifecycle", () => {
 
   it("actualiza contenido sin cambiar identidad ni fecha de creación", () => {
     expect(
-      updateSnippet(existing, { shortcut: "/hello", content: "Hola de nuevo" }, [existing], "2026-09-08T12:00:00.000Z"),
+      updateSnippet(
+        existing,
+        { name: "Saludo", shortcut: "/hello", content: "Hola de nuevo" },
+        [existing],
+        "2026-09-08T12:00:00.000Z",
+      ),
     ).toEqual({
       id: "one",
+      name: "Saludo",
       shortcut: "/hello",
       content: "Hola de nuevo",
       createdAt: "2026-09-08T10:00:00.000Z",

@@ -42,7 +42,7 @@ describe("prepareImport", () => {
 
   it("acepta un objeto con la lista dentro de snippets", () => {
     const result = prepareImport(
-      { snippets: [{ shortcut: "/hola", content: "Hola" }] },
+      { snippets: [{ name: "Saludo", shortcut: "/hola", content: "Hola" }] },
       [],
       () => "imported",
       "2026-09-08T11:00:00.000Z",
@@ -55,20 +55,22 @@ describe("prepareImport", () => {
   it("omite entradas inválidas y atajos repetidos", () => {
     const result = prepareImport(
       [
-        { shortcut: "/actual", content: "Repetido" },
-        { shortcut: "/nuevo", content: "Nuevo" },
-        { shortcut: "/nuevo", content: "Duplicado" },
+        { name: "Repetido", shortcut: "/actual", content: "Repetido" },
+        { name: "Nuevo", shortcut: "/nuevo", content: "Nuevo" },
+        { name: "Duplicado", shortcut: "/nuevo", content: "Duplicado" },
         { shortcut: 3, content: "Inválido" },
+        { shortcut: "/sin-nombre", content: "Sin nombre" },
+        { name: "Vacío", shortcut: "/vacio", content: "  " },
       ],
       [existing],
       () => "imported",
       "2026-09-08T11:00:00.000Z",
     );
 
-    expect(result.imported).toBe(1);
+    expect(result.imported).toBe(2);
     expect(result.duplicates).toBe(2);
-    expect(result.invalid).toBe(1);
-    expect(result.snippets.map((snippet) => snippet.shortcut)).toEqual(["/actual", "/nuevo"]);
+    expect(result.invalid).toBe(2);
+    expect(result.snippets.map((snippet) => snippet.shortcut)).toEqual(["/actual", "/nuevo", "/sin-nombre"]);
   });
 
   it("rechaza un archivo cuya raíz no sea una lista de atajos", () => {
