@@ -1,10 +1,19 @@
 // Options page: list of snippets on the left, editor on the right.
-// Picking a row opens it in the editor; "Nuevo atajo" clears the editor.
+// Picking a row opens it in the editor; "New snippet" clears the editor.
 import { filterSnippets, looksLikeAWord, ValidationError } from "../snippets/model";
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
 import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
 import { setupEditorResizer } from "./resize";
-import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../shared/ui";
+import { formatList, t } from "../shared/i18n";
+import {
+  errorMessage,
+  handleArrowKeys,
+  replayAnimation,
+  requiredElement,
+  setEmptyState,
+  setupLanguageSwitch,
+  snippetSummary,
+} from "../shared/ui";
 
 const SUCCESS_MESSAGE_MS = 4000;
 
@@ -92,7 +101,16 @@ shortcutInput.addEventListener("input", () => clearFieldError("shortcut"));
 contentInput.addEventListener("input", () => clearFieldError("content"));
 deleteButton.addEventListener("click", () => void deleteEditing());
 
-setupEditorResizer(layout, resizer);
+const refreshResizer = setupEditorResizer(layout, resizer);
+setupLanguageSwitch(() => {
+  // Messages already shown stay in the old language, so they go away.
+  for (const status of [listStatus, formStatus]) status.textContent = "";
+  clearFieldError("shortcut");
+  clearFieldError("content");
+  renderEditorLabels();
+  renderList();
+  refreshResizer();
+});
 void loadSnippets();
 
 // ---------- Loading and rendering ----------
@@ -119,9 +137,9 @@ function renderList(): void {
 
   emptyState.hidden = visibleSnippets.length > 0;
   if (snippets.length === 0) {
-    setEmptyState(emptyState, "Todavía no guardaste atajos", "Tocá «Nuevo atajo» para crear el primero.");
+    setEmptyState(emptyState, t().emptyTitle, t().emptyOptionsDetail);
   } else {
-    setEmptyState(emptyState, "No encontramos ese atajo", "Probá con otra búsqueda.");
+    setEmptyState(emptyState, t().noMatchTitle, t().noMatchDetail);
   }
 
   renderSelectionToolbar(visibleSnippets);
@@ -133,7 +151,7 @@ function renderRow(snippet: Snippet): HTMLLIElement {
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.checked = selectedIds.has(snippet.id);
-  checkbox.setAttribute("aria-label", `Seleccionar ${label}`);
+  checkbox.setAttribute("aria-label", t().selectSnippet(label));
   checkbox.addEventListener("change", () => {
     if (checkbox.checked) selectedIds.add(snippet.id);
     else selectedIds.delete(snippet.id);
@@ -144,7 +162,7 @@ function renderRow(snippet: Snippet): HTMLLIElement {
   const openButton = document.createElement("button");
   openButton.type = "button";
   openButton.className = "row-open";
-  openButton.setAttribute("aria-label", `Editar ${label}`);
+  openButton.setAttribute("aria-label", t().editSnippet(label));
   openButton.append(...snippetSummary(snippet));
   openButton.addEventListener("click", () => void switchEditor(snippet));
 
@@ -167,7 +185,7 @@ function renderSelectionToolbar(visibleSnippets: Snippet[]): void {
   selectAllInput.checked = visibleSnippets.length > 0 && visibleSelected === visibleSnippets.length;
   selectAllInput.indeterminate = visibleSelected > 0 && visibleSelected < visibleSnippets.length;
   deleteSelectedButton.hidden = selectedIds.size === 0;
-  deleteSelectedButton.textContent = `Eliminar seleccionados (${selectedIds.size})`;
+  deleteSelectedButton.textContent = t().deleteSelected(selectedIds.size);
 }
 
 function moveWithArrows(event: KeyboardEvent): void {
@@ -193,11 +211,7 @@ async function switchEditor(snippet: Snippet | undefined): Promise<void> {
   }
 
   if (hasUnsavedChanges()) {
-    const discard = await askConfirmation(
-      "¿Descartar los cambios?",
-      "Hay cambios sin guardar en el editor. Si seguís, se pierden.",
-      "Descartar",
-    );
+    const discard = await askConfirmation(t().discardTitle, t().discardMessage, t().discard);
     if (!discard) return;
   }
   openEditor(snippet);
@@ -226,8 +240,7 @@ function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
     nameInput.value = snippet.name ?? "";
   }
 
-  editorTitle.textContent = snippet ? `Editar ${snippet.shortcut}` : "Nuevo atajo";
-  saveButton.textContent = snippet ? "Guardar cambios" : "Guardar atajo";
+  renderEditorLabels();
   cancelButton.hidden = !snippet;
   deleteButton.hidden = !snippet;
   renderList();
@@ -238,6 +251,11 @@ function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
     // its scroll-margin in the CSS keeps the editor title in view too.
     shortcutInput.focus();
   }
+}
+
+function renderEditorLabels(): void {
+  editorTitle.textContent = editing ? t().editSnippet(editing.shortcut) : t().newSnippet;
+  saveButton.textContent = editing ? t().saveChanges : t().saveSnippet;
 }
 
 async function saveForm(): Promise<void> {
@@ -261,7 +279,7 @@ async function saveForm(): Promise<void> {
     return;
   }
 
-  const message = editing ? "Cambios guardados." : "Atajo guardado.";
+  const message = editing ? t().changesSaved : t().snippetSaved;
   await loadSnippets();
   justSavedId = saved.id;
   openEditor(undefined, { focus: false });
@@ -276,11 +294,7 @@ async function saveForm(): Promise<void> {
 async function confirmWordShortcut(shortcut: string): Promise<boolean> {
   if (!looksLikeAWord(shortcut) || shortcut === editing?.shortcut) return true;
 
-  const confirmed = await askConfirmation(
-    `¿Guardar «${shortcut}» sin símbolo?`,
-    `Se va a reemplazar cada vez que escribas «${shortcut}» como palabra suelta. Para evitarlo, empezalo con un símbolo, por ejemplo /${shortcut}.`,
-    "Guardar igual",
-  );
+  const confirmed = await askConfirmation(t().wordTitle(shortcut), t().wordMessage(shortcut), t().saveAnyway);
   if (!confirmed) shortcutInput.focus();
   return confirmed;
 }
@@ -289,7 +303,7 @@ async function confirmWordShortcut(shortcut: string): Promise<boolean> {
 
 async function deleteEditing(): Promise<void> {
   if (!editing) return;
-  const confirmed = await askConfirmation(`¿Eliminar ${editing.shortcut}?`, "Vas a borrar este atajo. No se puede deshacer.", "Eliminar");
+  const confirmed = await askConfirmation(t().deleteOneTitle(editing.shortcut), t().deleteOneMessage, t().delete);
   if (confirmed) await removeSnippets([editing.id]);
 }
 
@@ -297,18 +311,15 @@ async function deleteSelected(): Promise<void> {
   const ids = [...selectedIds];
   if (ids.length === 0) return;
 
-  const title = ids.length === 1 ? "¿Eliminar 1 atajo?" : `¿Eliminar ${ids.length} atajos?`;
   const shortcuts = snippets.filter((snippet) => selectedIds.has(snippet.id)).map((snippet) => snippet.shortcut);
-  const confirmed = await askConfirmation(title, `Vas a borrar ${listShortcuts(shortcuts)}. No se puede deshacer.`, "Eliminar");
+  const confirmed = await askConfirmation(t().deleteManyTitle(ids.length), t().deleteManyMessage(listShortcuts(shortcuts)), t().delete);
   if (confirmed) await removeSnippets(ids);
 }
 
-const spanishList = new Intl.ListFormat("es", { type: "conjunction" });
-
-/** "/a, /b y 3 más": names a few shortcuts without making the dialog huge. */
+/** "/a, /b and 3 more": names a few shortcuts without making the dialog huge. */
 function listShortcuts(shortcuts: string[], max = 5): string {
-  const shown = shortcuts.length > max ? [...shortcuts.slice(0, max), `${shortcuts.length - max} más`] : shortcuts;
-  return spanishList.format(shown);
+  const shown = shortcuts.length > max ? [...shortcuts.slice(0, max), t().more(shortcuts.length - max)] : shortcuts;
+  return formatList(shown);
 }
 
 async function removeSnippets(ids: string[]): Promise<void> {
@@ -322,7 +333,7 @@ async function removeSnippets(ids: string[]): Promise<void> {
   for (const id of ids) selectedIds.delete(id);
   if (editing && ids.includes(editing.id)) openEditor(undefined, { focus: false });
   await loadSnippets();
-  showMessage(listStatus, ids.length === 1 ? "Atajo eliminado." : `${ids.length} atajos eliminados.`);
+  showMessage(listStatus, t().deleted(ids.length));
   // The focused button no longer exists; move keyboard users back to the list.
   searchInput.focus();
 }
@@ -357,32 +368,32 @@ async function importFile(): Promise<void> {
     await loadSnippets();
     showMessage(listStatus, importMessage(result));
   } catch (error: unknown) {
-    const message = error instanceof SyntaxError ? "El archivo no contiene JSON válido." : errorMessage(error);
+    const message = error instanceof SyntaxError ? t().invalidJson : errorMessage(error);
     showMessage(listStatus, message, true);
   }
 }
 
 function importMessage({ imported, duplicates, invalid }: ImportResult): string {
-  const parts = [`${imported} ${imported === 1 ? "atajo importado" : "atajos importados"}`];
-  if (duplicates) parts.push(`${duplicates} ${duplicates === 1 ? "repetido" : "repetidos"}`);
-  if (invalid) parts.push(`${invalid} ${invalid === 1 ? "inválido" : "inválidos"}`);
-  return `${spanishList.format(parts)}.`;
+  const parts = [t().imported(imported)];
+  if (duplicates) parts.push(t().duplicates(duplicates));
+  if (invalid) parts.push(t().invalid(invalid));
+  return `${formatList(parts)}.`;
 }
 
 function exportSnippets(): void {
   if (snippets.length === 0) {
-    showMessage(listStatus, "Todavía no hay atajos para exportar.", true);
+    showMessage(listStatus, t().nothingToExport, true);
     return;
   }
 
   const file = new Blob([JSON.stringify(snippets, null, 2)], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(file);
-  link.download = `blasito-atajos-${new Date().toISOString().slice(0, 10)}.json`;
+  link.download = t().exportFileName(new Date().toISOString().slice(0, 10));
   link.click();
   URL.revokeObjectURL(link.href);
 
-  showMessage(listStatus, snippets.length === 1 ? "1 atajo exportado." : `${snippets.length} atajos exportados.`);
+  showMessage(listStatus, t().exported(snippets.length));
 }
 
 // ---------- Messages ----------

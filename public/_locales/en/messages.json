@@ -1,0 +1,6 @@
+{
+  "extensionDescription": {
+    "message": "Text expander: type a shortcut like /hi and Blasito replaces it with your saved text. Local-only, no accounts, no tracking.",
+    "description": "Shown in Chrome and in the store summary. Max 132 characters."
+  }
+}

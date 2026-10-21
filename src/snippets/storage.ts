@@ -1,3 +1,4 @@
+import { t } from "../shared/i18n";
 import { createSnippet, parseStoredSnippets, prepareImport, updateSnippet } from "./model";
 import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
@@ -20,7 +21,7 @@ export async function editSnippet(id: string, draft: SnippetDraft): Promise<Snip
   const snippets = await getSnippets();
   const current = snippets.find((snippet) => snippet.id === id);
   if (!current) {
-    throw new Error("No encontramos ese atajo. Puede que lo hayas eliminado en otra pestaña.");
+    throw new Error(t().snippetNotFound);
   }
 
   const updated = updateSnippet(current, draft, snippets);

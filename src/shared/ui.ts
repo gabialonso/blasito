@@ -1,17 +1,20 @@
 // Small DOM helpers shared by the popup and the options page.
 import { previewLines } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
+import { getLanguage, isLanguage, setLanguage, t, type Language, type Messages } from "./i18n";
+
+const LANGUAGE_KEY = "blasito.language";
 
 /** Finds an element that must exist in the page; fails loudly if the HTML changed. */
 export function requiredElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
-  if (!element) throw new Error(`No se encontró ${selector}.`);
+  if (!element) throw new Error(`Missing element: ${selector}`);
   return element;
 }
 
 /** Turns anything thrown into a message that can be shown to the user. */
 export function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Ocurrió un error inesperado.";
+  return error instanceof Error ? error.message : t().unexpectedError;
 }
 
 /** Fills the "nothing to show" box: a title and one line explaining what to do. */
@@ -79,4 +82,75 @@ export function snippetSummary(snippet: Snippet): HTMLElement[] {
   });
 
   return [heading, preview];
+}
+
+/**
+ * Wires the ES/EN switch and applies the saved language (or the browser's, the first time).
+ * `onChange` re-renders the texts that the page script builds itself.
+ */
+export function setupLanguageSwitch(onChange: () => void): void {
+  const inputs = [...document.querySelectorAll<HTMLInputElement>('input[name="language"]')];
+
+  const apply = (language: Language): void => {
+    setLanguage(language);
+    for (const input of inputs) input.checked = input.value === language;
+    translatePage();
+    onChange();
+  };
+
+  for (const input of inputs) {
+    input.addEventListener("change", () => {
+      if (!isLanguage(input.value)) return;
+      saveLanguage(input.value);
+      apply(input.value);
+    });
+  }
+  // The popup and the options page share localStorage, so a change in one reaches the other.
+  window.addEventListener("storage", (event) => {
+    if (event.key === LANGUAGE_KEY && isLanguage(event.newValue)) apply(event.newValue);
+  });
+
+  apply(savedLanguage());
+}
+
+/** Fills the elements marked in the HTML: data-i18n (text), data-i18n-placeholder, -label and -title. */
+function translatePage(): void {
+  document.documentElement.lang = getLanguage();
+  for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
+    element.textContent = staticText(element.dataset.i18n);
+  }
+  for (const element of document.querySelectorAll<HTMLElement>("[data-i18n-placeholder]")) {
+    element.setAttribute("placeholder", staticText(element.dataset.i18nPlaceholder));
+  }
+  for (const element of document.querySelectorAll<HTMLElement>("[data-i18n-label]")) {
+    element.setAttribute("aria-label", staticText(element.dataset.i18nLabel));
+  }
+  for (const element of document.querySelectorAll<HTMLElement>("[data-i18n-title]")) {
+    element.setAttribute("title", staticText(element.dataset.i18nTitle));
+  }
+}
+
+function staticText(key: string | undefined): string {
+  const text = t()[key as keyof Messages];
+  if (typeof text !== "string") throw new Error(`Missing text: ${key}`);
+  return text;
+}
+
+function savedLanguage(): Language {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_KEY);
+    if (isLanguage(saved)) return saved;
+  } catch {
+    // Storage blocked: fall back to the browser's language.
+  }
+  return navigator.language.toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+function saveLanguage(language: Language): void {
+  // Only a preference: if storage is blocked, the language just isn't remembered.
+  try {
+    localStorage.setItem(LANGUAGE_KEY, language);
+  } catch {
+    /* ignore */
+  }
 }

@@ -1,3 +1,4 @@
+import { t } from "../shared/i18n";
 import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
 /** A draft that can't be saved, with the field that needs fixing. */
@@ -14,15 +15,15 @@ export class ValidationError extends Error {
 export function validateDraft(draft: SnippetDraft, snippets: Snippet[], currentId?: string): SnippetDraft {
   const shortcut = draft.shortcut.trim();
   if (!shortcut) {
-    throw new ValidationError("Escribí el atajo que querés usar.", "shortcut");
+    throw new ValidationError(t().missingShortcut, "shortcut");
   }
 
   if (!draft.content.trim()) {
-    throw new ValidationError("Escribí el texto que querés guardar.", "content");
+    throw new ValidationError(t().missingContent, "content");
   }
 
   if (snippets.some((snippet) => snippet.shortcut === shortcut && snippet.id !== currentId)) {
-    throw new ValidationError("Ya tenés un atajo igual. Elegí otro.", "shortcut");
+    throw new ValidationError(t().duplicateShortcut, "shortcut");
   }
 
   const name = draft.name?.trim();
@@ -67,7 +68,7 @@ export function parseStoredSnippets(value: unknown): Snippet[] {
   }
 
   if (!Array.isArray(value) || !value.every(isSnippet)) {
-    throw new Error("No pudimos leer los atajos guardados.");
+    throw new Error(t().unreadableStorage);
   }
 
   return value;
@@ -142,7 +143,7 @@ function importEntries(value: unknown): unknown[] {
     return (value as Record<string, unknown>).snippets as unknown[];
   }
 
-  throw new Error("El archivo debe contener una lista de atajos.");
+  throw new Error(t().notAList);
 }
 
 function isImportEntry(value: unknown): value is SnippetDraft {
