@@ -27,6 +27,8 @@ function setSnippets(newSnippets: Snippet[]): void {
 
 function handleInput(event: Event): void {
   if (isReplacing || snippets.length === 0) return;
+  // Unsupported fields (passwords, numbers, dates...) are dropped before looking at what was typed.
+  if (!isTextControl(event.target) && !isContentEditable(event.target)) return;
 
   const { inputType, data } = event as Partial<InputEvent>;
   if (!mightCompleteShortcut(inputType, data, lastCharacters)) return;
@@ -59,9 +61,13 @@ function isTextControl(target: EventTarget | null): target is HTMLInputElement |
   return target instanceof HTMLTextAreaElement || (target instanceof HTMLInputElement && supportsInputType(target.type));
 }
 
+function isContentEditable(target: EventTarget | null): target is HTMLElement {
+  return target instanceof HTMLElement && target.isContentEditable;
+}
+
 /** Returns the outermost editable element, which is the whole editor (not just the paragraph typed in). */
 function contentEditableHost(target: EventTarget | null): HTMLElement | undefined {
-  if (!(target instanceof HTMLElement) || !target.isContentEditable) return undefined;
+  if (!isContentEditable(target)) return undefined;
 
   let editor = target;
   while (editor.parentElement?.isContentEditable) editor = editor.parentElement;
