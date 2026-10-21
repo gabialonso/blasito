@@ -46,6 +46,11 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
 
+  /* Motion: short and snappy, only to confirm what changed. */
+  --speed-fast: 120ms;
+  --speed: 220ms;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+
   /* Light theme only for now; a dark theme will come later. */
   color-scheme: light;
 }
@@ -71,8 +76,6 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3) var(--space-5);
-  max-width: 76rem;
-  margin: 0 auto;
   padding: var(--space-4) var(--space-5);
 }
 .topbar-copy { display: grid; gap: var(--space-1); max-width: 46rem; }
@@ -120,6 +123,7 @@ input[type="checkbox"]::before {
   background: var(--bg);
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0, 43% 62%);
   transform: scale(0);
+  transition: transform var(--speed-fast) var(--ease-out);
 }
 input[type="checkbox"]:checked,
 input[type="checkbox"]:indeterminate { background: var(--ink); }
@@ -139,11 +143,15 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   background: var(--bg);
   box-shadow: var(--shadow-small);
   font-weight: 700;
+  transition: background-color var(--speed-fast), color var(--speed-fast), transform var(--speed-fast) var(--ease-out), box-shadow var(--speed-fast) var(--ease-out);
 }
 .button:hover,
 .button:focus-visible,
 .file-input:hover .button { color: var(--ink); background: var(--mark); }
+/* Lift slightly on hover and press flat on click, like a physical key. */
+.button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
 .button:active { box-shadow: none; transform: translate(3px, 3px); }
+.button.danger:hover { box-shadow: 4px 4px 0 var(--danger); }
 
 .button.primary { color: var(--bg); background: var(--ink); }
 .button.primary:hover,
@@ -160,10 +168,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .topbar .button:focus-visible,
 .topbar .file-input:hover .button { color: var(--bg); background: var(--ink); }
 
-@media (prefers-reduced-motion: reduce) {
-  .button:active { transform: none; }
-}
-
 .form-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .form-actions .danger { margin-left: auto; }
 
@@ -175,6 +179,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 /* ---------- Messages ---------- */
 
 .status { padding: var(--space-2) var(--space-3); border: 3px solid var(--ok); border-left-width: 10px; font-weight: 700; }
+.status.is-announced { animation: slide-in var(--speed) var(--ease-out); }
 .status[data-kind="error"] { border-color: var(--danger); color: var(--bg); background: var(--danger); }
 .status:empty { display: none; }
 .empty-state { display: grid; gap: var(--space-1); padding: var(--space-6) var(--space-4); border: 3px dashed var(--ink); text-align: center; }
@@ -202,29 +207,22 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   display: -webkit-box;
   overflow: hidden;
   margin-top: var(--space-2);
-  max-width: 65ch;
   color: var(--ink-soft);
   overflow-wrap: anywhere;
-  white-space: pre-line;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+.line-break { font-family: var(--font-mono); font-weight: 700; }
 .snippet-list { margin: 0; padding: 0; list-style: none; }
-
-/* Inverted state: the row being edited and a just-copied popup item. */
-.is-inverted { color: var(--bg); background: var(--ink); }
-.is-inverted .snippet-preview { color: var(--bg); }
-.is-inverted .shortcut { border-color: var(--bg); color: var(--bg); background: var(--ink); box-shadow: 2px 2px 0 var(--bg); }
 
 /* ---------- Options page ---------- */
 
+/* Full width: the editor keeps a fixed width on the right and the list takes all the rest. */
 .options-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem);
   align-items: start;
   gap: var(--space-6);
-  max-width: 76rem;
-  margin: 0 auto;
   padding: var(--space-6) var(--space-5);
 }
 .panel { border: var(--border); background: var(--bg); box-shadow: var(--shadow); }
@@ -241,13 +239,13 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .snippet-row.is-inverted > input { border-color: var(--bg); }
 .snippet-row.is-inverted > input:checked { background: var(--bg); }
 .snippet-row.is-inverted > input::before { background: var(--ink); }
-.row-open { display: block; min-width: 0; padding: var(--space-3) var(--space-3) var(--space-4); border: 0; background: transparent; text-align: left; }
+.row-open { display: block; min-width: 0; padding: var(--space-3) var(--space-3) var(--space-4); border: 0; background: transparent; text-align: left; transition: background-color var(--speed-fast); }
 .row-open:hover,
 .row-open:focus-visible { color: var(--ink); background: var(--mark); outline: 0; }
 .row-open:hover .snippet-preview,
 .row-open:focus-visible .snippet-preview { color: var(--ink); }
 
-@media (max-width: 860px) {
+@media (max-width: 1024px) {
   /* Extra right padding leaves room for the hard shadow. */
   .options-layout { grid-template-columns: 1fr; gap: var(--space-5); padding: var(--space-4) var(--space-5) var(--space-4) var(--space-3); }
   .panel { box-shadow: 4px 4px 0 var(--ink); }
@@ -275,6 +273,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   border: 0;
   background: transparent;
   text-align: left;
+  transition: background-color var(--speed-fast);
 }
 .popup-item:hover,
 .popup-item:focus-visible { color: var(--ink); background: var(--mark); outline: 0; }
@@ -283,7 +282,76 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .popup-item .snippet-heading { flex-wrap: nowrap; }
 .popup-item .shortcut { flex: none; }
 .popup-item .snippet-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.popup-item .snippet-preview { -webkit-line-clamp: 1; }
+/* One line that fills the row, cut with "…" wherever it ends. */
+.popup-item .snippet-preview { display: block; white-space: nowrap; text-overflow: ellipsis; }
 .copy-label { padding-top: .2rem; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; }
 .popup-footer { padding: 0 var(--space-4) var(--space-4); }
 .popup-footer .button { width: 100%; }
+
+/* ---------- Scrollbars ----------
+   Square, thick-bordered and yellow on hover, like the rest of the UI.
+   Chromium ignores ::-webkit-scrollbar when scrollbar-color/scrollbar-width are set,
+   so the standard properties are only a fallback for browsers without it (Firefox). */
+
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track { background: var(--bg); border-left: 3px solid var(--ink); }
+/* The transparent border leaves a gap around the thumb; the left side keeps the track line. */
+::-webkit-scrollbar-thumb { border: 3px solid transparent; border-left-color: var(--ink); background: var(--ink) padding-box; }
+/* Yellow alone would barely show on white, so the hovered thumb gets a full black outline. */
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active { border-color: var(--ink); background: var(--mark) padding-box; }
+::-webkit-scrollbar-corner { background: var(--bg); }
+/* Horizontal bars: the track line goes on top instead of the left. */
+::-webkit-scrollbar-track:horizontal { border-top: 3px solid var(--ink); border-left: 0; }
+::-webkit-scrollbar-thumb:horizontal { border-left-color: transparent; border-top-color: var(--ink); }
+::-webkit-scrollbar-thumb:horizontal:hover { border-color: var(--ink); }
+
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-color: var(--ink) var(--bg); }
+}
+
+/* ---------- Inverted state ----------
+   The row being edited and a just-copied popup item turn black.
+   Kept at the end of the file so it always wins over the yellow hover. */
+
+.snippet-row.is-inverted,
+.popup-item.is-inverted,
+.popup-item.is-inverted:hover,
+.popup-item.is-inverted:focus-visible { color: var(--bg); background: var(--ink); }
+.is-inverted .snippet-preview,
+.popup-item.is-inverted:hover .snippet-preview,
+.popup-item.is-inverted:focus-visible .snippet-preview { color: var(--bg); }
+.is-inverted .shortcut { border-color: var(--bg); color: var(--bg); background: var(--ink); box-shadow: 2px 2px 0 var(--bg); }
+
+/* ---------- Animations ---------- */
+
+/* A message slides in so it is noticed. */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-12px); }
+}
+
+/* A copied item is "stamped": it drops into place. */
+@keyframes stamp {
+  from { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 var(--mark); }
+}
+.popup-item.is-inverted { animation: stamp var(--speed) var(--ease-out); }
+
+/* The editor nudges when a snippet opens in it, to show its content changed. */
+@keyframes nudge {
+  from { transform: translate(-6px, -6px); box-shadow: 12px 12px 0 var(--ink); }
+}
+.editor-panel.is-opening { animation: nudge var(--speed) var(--ease-out); }
+
+/* A just-saved row flashes yellow, then fades back. */
+@keyframes flash {
+  from { background: var(--mark); }
+}
+.snippet-row.is-saved { animation: flash 1.2s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+  .button:hover, .button:active { transform: none; }
+}

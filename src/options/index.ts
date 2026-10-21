@@ -3,7 +3,7 @@
 import { filterSnippets } from "../snippets/model";
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
 import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
-import { errorMessage, requiredElement, setEmptyState, snippetSummary } from "../ui";
+import { errorMessage, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
 
 const SUCCESS_MESSAGE_MS = 4000;
 
@@ -34,13 +34,15 @@ const cancelButton = requiredElement<HTMLButtonElement>("#cancel-button");
 const deleteButton = requiredElement<HTMLButtonElement>("#delete-button");
 
 // In the one-column layout the editor is below the list and has to be scrolled into view.
-const oneColumnLayout = window.matchMedia("(max-width: 860px)");
+const oneColumnLayout = window.matchMedia("(max-width: 1024px)");
 
 // ---------- State ----------
 
 let snippets: Snippet[] = [];
 /** Snippet open in the editor, or undefined while creating a new one. */
 let editing: Snippet | undefined;
+/** Snippet saved a moment ago; its row flashes once on the next render. */
+let justSavedId: string | undefined;
 const selectedIds = new Set<string>();
 const messageTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
@@ -116,6 +118,7 @@ function renderRow(snippet: Snippet): HTMLLIElement {
 
   const row = document.createElement("li");
   row.className = "snippet-row";
+  if (snippet.id === justSavedId) row.classList.add("is-saved");
   if (snippet.id === editing?.id) {
     row.classList.add("is-inverted");
     openButton.setAttribute("aria-current", "true");
@@ -164,6 +167,7 @@ function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
   renderList();
 
   if (focus) {
+    replayAnimation(editor, "is-opening");
     if (oneColumnLayout.matches) editor.scrollIntoView({ block: "start" });
     shortcutInput.focus({ preventScroll: !oneColumnLayout.matches });
   }
@@ -176,9 +180,9 @@ async function saveForm(): Promise<void> {
     name: nameInput.value,
   };
 
+  let saved: Snippet;
   try {
-    if (editing) await editSnippet(editing.id, draft);
-    else await addSnippet(draft);
+    saved = editing ? await editSnippet(editing.id, draft) : await addSnippet(draft);
   } catch (error: unknown) {
     showMessage(formStatus, errorMessage(error), true);
     return;
@@ -186,7 +190,9 @@ async function saveForm(): Promise<void> {
 
   const message = editing ? "Cambios guardados." : "Atajo guardado.";
   await loadSnippets();
+  justSavedId = saved.id;
   openEditor(undefined, { focus: false });
+  justSavedId = undefined;
   showMessage(formStatus, message);
 }
 
@@ -267,6 +273,7 @@ function exportSnippets(): void {
 function showMessage(element: HTMLElement, message: string, isError = false): void {
   element.textContent = message;
   element.dataset.kind = isError ? "error" : "success";
+  replayAnimation(element, "is-announced");
 
   clearTimeout(messageTimers.get(element));
   if (isError) return;

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createSnippet,
   filterSnippets,
+  previewLines,
   parseStoredSnippets,
   updateSnippet,
   validateDraft,
@@ -133,5 +134,15 @@ describe("filterSnippets", () => {
     expect(filterSnippets([existing, other], "/BUG")).toEqual([other]);
     expect(filterSnippets([existing, other], "esperado")).toEqual([other]);
     expect(filterSnippets([existing, other], "  ")).toEqual([existing, other]);
+  });
+});
+
+describe("previewLines", () => {
+  it("devuelve las líneas con contenido, sin espacios sobrantes", () => {
+    expect(previewLines("Saludos,\n  Gabriel  \n\n\nEquipo de QA\n")).toEqual(["Saludos,", "Gabriel", "Equipo de QA"]);
+  });
+
+  it("mantiene un texto de una sola línea", () => {
+    expect(previewLines("Listo, gracias.")).toEqual(["Listo, gracias."]);
   });
 });
