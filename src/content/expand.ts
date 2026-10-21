@@ -1,5 +1,5 @@
 import type { Snippet } from "../snippets/types";
-import { findExpansion } from "../snippets/expansion";
+import { findExpansion, type Expansion } from "../snippets/expansion";
 
 export interface TextControl {
   value: string;
@@ -47,21 +47,12 @@ export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]):
   const caret = selection.getRangeAt(0);
   if (!editor.contains(caret.startContainer)) return undefined;
 
-  const beforeCaret = caret.cloneRange();
-  beforeCaret.selectNodeContents(editor);
-  beforeCaret.setEnd(caret.startContainer, caret.startOffset);
-  const value = beforeCaret.toString();
-  const expansion = findExpansion(value, value.length, snippets);
-  if (!expansion) return undefined;
-
-  const walker = doc.createTreeWalker(editor, doc.defaultView?.NodeFilter.SHOW_TEXT ?? 4);
-  const textNodes: Text[] = [];
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) textNodes.push(node as Text);
-  const start = locateTextOffset(textNodes.map((node) => node.data), expansion.start);
+  const start = findContentEditableExpansion(editor, caret, snippets);
   if (!start) return undefined;
+  const { expansion } = start;
 
   const replacement = caret.cloneRange();
-  replacement.setStart(textNodes[start.nodeIndex], start.offset);
+  replacement.setStart(start.node, start.offset);
   selection.removeAllRanges();
   selection.addRange(replacement);
 
@@ -81,4 +72,33 @@ export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]):
   const InputEventClass = doc.defaultView?.InputEvent;
   editor.dispatchEvent(InputEventClass ? new InputEventClass("input", { bubbles: true, data: expansion.content, inputType: "insertReplacementText" }) : new Event("input", { bubbles: true }));
   return expansion.content;
+}
+
+function findContentEditableExpansion(
+  editor: HTMLElement,
+  caret: Range,
+  snippets: Snippet[],
+): { node: Text; offset: number; expansion: Expansion } | undefined {
+  // Fast path: when the caret's text node already holds the longest shortcut plus the
+  // character before it, there is no need to serialize the whole editor.
+  const caretNode = caret.startContainer;
+  const longest = Math.max(...snippets.map((snippet) => snippet.shortcut.length));
+  if (caretNode.nodeType === Node.TEXT_NODE && caret.startOffset > longest) {
+    const expansion = findExpansion((caretNode as Text).data, caret.startOffset, snippets);
+    return expansion && { node: caretNode as Text, offset: expansion.start, expansion };
+  }
+
+  const beforeCaret = caret.cloneRange();
+  beforeCaret.selectNodeContents(editor);
+  beforeCaret.setEnd(caret.startContainer, caret.startOffset);
+  const value = beforeCaret.toString();
+  const expansion = findExpansion(value, value.length, snippets);
+  if (!expansion) return undefined;
+
+  const doc = editor.ownerDocument;
+  const walker = doc.createTreeWalker(editor, doc.defaultView?.NodeFilter.SHOW_TEXT ?? 4);
+  const textNodes: Text[] = [];
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) textNodes.push(node as Text);
+  const start = locateTextOffset(textNodes.map((node) => node.data), expansion.start);
+  return start && { node: textNodes[start.nodeIndex], offset: start.offset, expansion };
 }
