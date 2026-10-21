@@ -28,20 +28,22 @@ Si modificás el código, volvé a ejecutar `npm run build` y recargá Blasito d
 npm run package
 ```
 
-Esto genera `blasito.zip` en la carpeta del proyecto. El archivo ya contiene únicamente la extensión compilada y se puede subir directamente a Chrome Web Store.
+Esto genera `blasito.zip` en la carpeta del proyecto. El archivo contiene la extensión compilada y las licencias de las fuentes, y se puede subir directamente a Chrome Web Store.
 
 ## Cómo se usa
 
-1. Abrí Blasito y elegí **Crear o editar atajos**.
-2. Guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar.
+1. Abrí Blasito y elegí **Administrar atajos**.
+2. Tocá **Nuevo atajo** y guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar. Para cambiar o eliminar uno, elegilo en la lista y se abre en el editor.
 3. Escribí `/hola` en un campo de texto o editor web.
 4. Al terminar de escribir el atajo, Blasito lo reemplaza automáticamente.
 
-Blasito deja el cursor al final del texto insertado.
+Blasito deja el cursor al final del texto insertado. Funciona en `textarea`, en campos `input` de tipo texto, búsqueda, email, URL y teléfono, y en editores `contenteditable`. Nunca actúa en campos de contraseña.
 
-## Importar varios atajos
+Desde el popup podés buscar un atajo y elegirlo para copiar su texto. Las flechas ↑ y ↓ recorren los resultados.
 
-En **Crear o editar atajos**, elegí un archivo JSON. Podés armarlo a mano como una lista:
+## Importar y exportar
+
+En **Administrar atajos**, **Exportar** (arriba a la derecha) descarga todos tus atajos e **Importar** agrega los de un archivo JSON. Podés armarlo a mano como una lista:
 
 ```json
 [
@@ -57,19 +59,23 @@ En **Crear o editar atajos**, elegí un archivo JSON. Podés armarlo a mano como
 ]
 ```
 
-También se acepta el mismo arreglo dentro de una propiedad `snippets`. El nombre es opcional; `shortcut` y `content` son obligatorios. Si un archivo no es válido, Blasito no cambia lo que ya tenías. Los atajos repetidos se saltean y la pantalla te informa el resultado.
+También se acepta el mismo arreglo dentro de una propiedad `snippets`, y el archivo que genera **Exportar**. El nombre es opcional; `shortcut` y `content` son obligatorios y no pueden estar vacíos. Si un archivo no es válido, Blasito no cambia lo que ya tenías. Los atajos repetidos se saltean y la pantalla te informa el resultado.
 
-## Qué incluye este MVP
+## Qué incluye
 
-- Crear, editar, eliminar y buscar atajos.
-- Buscar los textos guardados desde el popup.
+- Crear, editar, buscar y eliminar atajos, de a uno o seleccionando varios.
+- Buscar y copiar los textos guardados desde el popup.
 - Evitar atajos vacíos o repetidos.
-- Importar varios atajos desde JSON.
+- Importar y exportar atajos en JSON.
 - Expandir atajos en campos de texto y editores `contenteditable`.
 - Reproducir un tono breve al insertar un atajo.
 - Conservar los datos al cerrar el navegador.
 
-Todavía no incluye exportación ni integración especial con editores como Monaco o CodeMirror.
+Todavía no incluye integración especial con editores como Monaco o CodeMirror.
+
+## Privacidad
+
+El script de contenido se ejecuta en todas las páginas porque tiene que detectar los atajos mientras escribís. Solo lee el campo activo cuando el último carácter escrito puede completar un atajo, no envía nada a ningún servidor y el único permiso que pide es `storage`.
 
 ## Desarrollo
 
@@ -87,7 +93,15 @@ src/content/         integración con los campos de las páginas
 src/options/         pantalla para administrar atajos
 src/popup/           búsqueda rápida
 src/snippets/        modelo, expansión y almacenamiento
+src/ui.ts            utilidades compartidas por popup y configuración
+src/styles.css       estilos y variables visuales
 tests/               pruebas de la lógica
 ```
 
-La fuente de la interfaz está incluida dentro del build. Su licencia está junto al archivo en `src/assets/`.
+## Tipografía
+
+La interfaz usa [Asap](https://github.com/Omnibus-Type/Asap), en su versión variable: un solo archivo con todos los pesos y el alfabeto latino, que incluye los caracteres del español.
+
+Los atajos y el campo para escribirlos usan [Hack](https://github.com/source-foundry/Hack), una fuente monoespaciada que distingue con claridad `0/O`, `1/l/I` y los símbolos. Se incluyen los subconjuntos web de Regular y Bold, que cubren los caracteres del español.
+
+Asap tiene licencia SIL Open Font License 1.1 y Hack, licencias MIT y Bitstream Vera. Las fuentes se sirven desde la extensión, sin pedidos externos, y sus archivos y licencias están en `src/assets/fonts/`.

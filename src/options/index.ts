@@ -1,6 +1,7 @@
 import { filterSnippets } from "../snippets/model";
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
-import { addSnippet, deleteSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
+import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
+import { requiredElement, snippetSummary } from "../ui";
 
 const form = requiredElement<HTMLFormElement>("#snippet-form");
 const nameInput = requiredElement<HTMLInputElement>("#name");
@@ -16,12 +17,14 @@ const cancelButton = requiredElement<HTMLButtonElement>("#cancel-edit");
 const formStatus = requiredElement<HTMLElement>("#form-status");
 const listStatus = requiredElement<HTMLElement>("#list-status");
 const importInput = requiredElement<HTMLInputElement>("#import-file");
-const importStatus = requiredElement<HTMLElement>("#import-status");
 const exportButton = requiredElement<HTMLButtonElement>("#export-button");
-const exportStatus = requiredElement<HTMLElement>("#export-status");
+const newButton = requiredElement<HTMLButtonElement>("#new-snippet");
+const deleteCurrentButton = requiredElement<HTMLButtonElement>("#delete-current");
+const editor = requiredElement<HTMLElement>("#editor");
+const narrowLayout = window.matchMedia("(max-width: 860px)");
 const selectAllInput = requiredElement<HTMLInputElement>("#select-all");
 const bulkDeleteButton = requiredElement<HTMLButtonElement>("#bulk-delete");
-const bulkDeleteLabel = requiredElement<HTMLElement>("#bulk-delete-label");
+const listToolbar = requiredElement<HTMLElement>(".list-toolbar");
 
 let snippets: Snippet[] = [];
 let editingId: string | undefined;
@@ -30,21 +33,27 @@ const statusTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
 const STATUS_TIMEOUT_MS = 4000;
 
-const actionIcons = {
-  edit: '<svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
-  trash: '<svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
-} as const;
-
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   void saveForm();
 });
-cancelButton.addEventListener("click", () => resetForm());
+cancelButton.addEventListener("click", () => {
+  resetForm();
+  shortcutInput.focus();
+});
+newButton.addEventListener("click", () => {
+  resetForm();
+  focusEditor();
+});
+deleteCurrentButton.addEventListener("click", () => {
+  const current = snippets.find((snippet) => snippet.id === editingId);
+  if (current) void removeSnippets([current.id], `¿Eliminar ${current.shortcut}?`);
+});
 searchInput.addEventListener("input", renderSnippets);
 importInput.addEventListener("change", () => void importFile());
 exportButton.addEventListener("click", exportSnippets);
 selectAllInput.addEventListener("change", () => toggleSelectAll(selectAllInput.checked));
-bulkDeleteButton.addEventListener("click", () => void bulkDeleteSnippets());
+bulkDeleteButton.addEventListener("click", bulkDeleteSnippets);
 void loadSnippets();
 
 async function loadSnippets(): Promise<void> {
@@ -54,8 +63,7 @@ async function loadSnippets(): Promise<void> {
     listStatus.textContent = "";
     renderSnippets();
   } catch (error: unknown) {
-    listStatus.textContent = messageFrom(error);
-    listStatus.dataset.kind = "error";
+    showStatus(listStatus, messageFrom(error), true);
   }
 }
 
@@ -94,36 +102,31 @@ function renderSnippets(): void {
   count.textContent = String(snippets.length);
   emptyState.hidden = visibleSnippets.length > 0;
   emptyState.querySelector("strong")!.textContent = snippets.length ? "No encontramos ese atajo" : "Todavía no guardaste atajos";
-  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá el primero con el formulario.";
+  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Tocá «Nuevo atajo» para crear el primero.";
   updateBulkBar(visibleSnippets);
 }
 
 function renderSnippet(snippet: Snippet): HTMLLIElement {
-  const item = document.createElement("li");
-  item.className = "snippet-card";
+  const label = snippet.name ? `${snippet.shortcut} (${snippet.name})` : snippet.shortcut;
   const select = document.createElement("input");
   select.type = "checkbox";
-  select.className = "snippet-select";
   select.checked = selectedIds.has(snippet.id);
-  select.setAttribute("aria-label", `Seleccionar ${snippet.name || snippet.shortcut}`);
+  select.setAttribute("aria-label", `Seleccionar ${label}`);
   select.addEventListener("change", () => toggleSelection(snippet.id, select.checked));
-  const copy = document.createElement("div");
-  copy.className = "snippet-copy";
-  const heading = document.createElement("div");
-  heading.className = "snippet-heading";
-  const shortcut = document.createElement("code");
-  shortcut.className = "shortcut";
-  shortcut.textContent = snippet.shortcut;
-  const name = document.createElement("strong");
-  name.textContent = snippet.name || "Sin nombre";
-  const preview = document.createElement("p");
-  preview.textContent = snippet.content;
-  const actions = document.createElement("div");
-  actions.className = "card-actions";
-  actions.append(actionButton("Editar", "edit", () => startEditing(snippet)), actionButton("Eliminar", "trash", () => void removeSnippet(snippet), "danger"));
-  heading.append(shortcut, name);
-  copy.append(heading, preview);
-  item.append(select, copy, actions);
+  // The whole row opens the snippet in the editor: one obvious target instead of small buttons.
+  const open = document.createElement("button");
+  open.type = "button";
+  open.className = "row-open";
+  open.setAttribute("aria-label", `Editar ${label}`);
+  open.append(...snippetSummary(snippet));
+  open.addEventListener("click", () => startEditing(snippet));
+  const item = document.createElement("li");
+  item.className = "snippet-row";
+  if (snippet.id === editingId) {
+    item.classList.add("is-inverted");
+    open.setAttribute("aria-current", "true");
+  }
+  item.append(select, open);
   return item;
 }
 
@@ -143,21 +146,12 @@ function toggleSelectAll(checked: boolean): void {
 
 function updateBulkBar(visibleSnippets: Snippet[]): void {
   const visibleSelected = visibleSnippets.filter((snippet) => selectedIds.has(snippet.id));
-  selectAllInput.disabled = visibleSnippets.length === 0;
+  // A disabled checkbox is nearly invisible; hide the whole toolbar when there is nothing to select.
+  listToolbar.hidden = visibleSnippets.length === 0 && selectedIds.size === 0;
   selectAllInput.checked = visibleSnippets.length > 0 && visibleSelected.length === visibleSnippets.length;
   selectAllInput.indeterminate = visibleSelected.length > 0 && visibleSelected.length < visibleSnippets.length;
   bulkDeleteButton.hidden = selectedIds.size === 0;
-  bulkDeleteLabel.textContent = `Eliminar seleccionados (${selectedIds.size})`;
-}
-
-function actionButton(label: string, icon: keyof typeof actionIcons, action: () => void, className = ""): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = `text-button ${className}`.trim();
-  button.insertAdjacentHTML("afterbegin", actionIcons[icon]);
-  button.append(label);
-  button.addEventListener("click", action);
-  return button;
+  bulkDeleteButton.textContent = `Eliminar seleccionados (${selectedIds.size})`;
 }
 
 function startEditing(snippet: Snippet): void {
@@ -165,41 +159,41 @@ function startEditing(snippet: Snippet): void {
   nameInput.value = snippet.name ?? "";
   shortcutInput.value = snippet.shortcut;
   contentInput.value = snippet.content;
-  editorTitle.textContent = "Editar atajo";
+  editorTitle.textContent = `Editar ${snippet.shortcut}`;
   submitLabel.textContent = "Guardar cambios";
   cancelButton.hidden = false;
+  deleteCurrentButton.hidden = false;
   formStatus.textContent = "";
-  nameInput.focus();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  renderSnippets();
+  focusEditor();
 }
 
-async function removeSnippet(snippet: Snippet): Promise<void> {
-  if (!window.confirm(`¿Eliminar ${snippet.shortcut}?`)) return;
-
-  try {
-    await deleteSnippet(snippet.id);
-    if (editingId === snippet.id) resetForm();
-    selectedIds.delete(snippet.id);
-    await loadSnippets();
-  } catch (error: unknown) {
-    showStatus(listStatus, messageFrom(error), true);
-  }
+function focusEditor(): void {
+  // On narrow screens the editor sits below the list; on wide ones it is already visible.
+  if (narrowLayout.matches) editor.scrollIntoView({ block: "start" });
+  shortcutInput.focus({ preventScroll: !narrowLayout.matches });
 }
 
-async function bulkDeleteSnippets(): Promise<void> {
+function bulkDeleteSnippets(): void {
   const ids = [...selectedIds];
   if (!ids.length) return;
+  void removeSnippets(
+    ids,
+    ids.length === 1 ? "¿Eliminar el atajo seleccionado?" : `¿Eliminar los ${ids.length} atajos seleccionados?`,
+  );
+}
 
-  const confirmMessage =
-    ids.length === 1 ? "¿Eliminar el atajo seleccionado?" : `¿Eliminar los ${ids.length} atajos seleccionados?`;
-  if (!window.confirm(confirmMessage)) return;
+async function removeSnippets(ids: string[], question: string): Promise<void> {
+  if (!window.confirm(question)) return;
 
   try {
     await deleteSnippets(ids);
     if (editingId && ids.includes(editingId)) resetForm();
-    selectedIds.clear();
+    for (const id of ids) selectedIds.delete(id);
     await loadSnippets();
     showStatus(listStatus, ids.length === 1 ? "Atajo eliminado." : `${ids.length} atajos eliminados.`);
+    // The focused row button is gone; keep keyboard users in the list area.
+    searchInput.focus();
   } catch (error: unknown) {
     showStatus(listStatus, messageFrom(error), true);
   }
@@ -207,7 +201,7 @@ async function bulkDeleteSnippets(): Promise<void> {
 
 function exportSnippets(): void {
   if (!snippets.length) {
-    showStatus(exportStatus, "Todavía no hay atajos para descargar.", true);
+    showStatus(listStatus, "Todavía no hay atajos para exportar.", true);
     return;
   }
 
@@ -218,7 +212,7 @@ function exportSnippets(): void {
   link.download = `blasito-atajos-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   URL.revokeObjectURL(url);
-  showStatus(exportStatus, snippets.length === 1 ? "1 atajo descargado." : `${snippets.length} atajos descargados.`);
+  showStatus(listStatus, snippets.length === 1 ? "1 atajo exportado." : `${snippets.length} atajos exportados.`);
 }
 
 async function importFile(): Promise<void> {
@@ -227,27 +221,32 @@ async function importFile(): Promise<void> {
 
   try {
     const result = await importSnippets(JSON.parse(await file.text()) as unknown);
-    showStatus(importStatus, importMessage(result));
     importInput.value = "";
     await loadSnippets();
+    showStatus(listStatus, importMessage(result));
   } catch (error: unknown) {
-    showStatus(importStatus, error instanceof SyntaxError ? "El archivo no contiene JSON válido." : messageFrom(error), true);
+    importInput.value = "";
+    showStatus(listStatus, error instanceof SyntaxError ? "El archivo no contiene JSON válido." : messageFrom(error), true);
   }
 }
 
 function resetForm(clearStatus = true): void {
   editingId = undefined;
   form.reset();
-  editorTitle.textContent = "Crear nuevo atajo";
+  editorTitle.textContent = "Nuevo atajo";
   submitLabel.textContent = "Guardar atajo";
   cancelButton.hidden = true;
+  deleteCurrentButton.hidden = true;
   if (clearStatus) formStatus.textContent = "";
+  renderSnippets();
 }
 
 function showStatus(element: HTMLElement, message: string, isError = false): void {
   element.textContent = message;
   element.dataset.kind = isError ? "error" : "success";
   clearTimeout(statusTimers.get(element));
+  // Errors stay visible until the next action so they are not missed.
+  if (isError) return;
   statusTimers.set(
     element,
     setTimeout(() => {
@@ -267,10 +266,4 @@ function importMessage({ imported, duplicates, invalid }: ImportResult): string 
 
 function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : "Ocurrió un error inesperado.";
-}
-
-function requiredElement<T extends Element>(selector: string): T {
-  const element = document.querySelector<T>(selector);
-  if (!element) throw new Error(`No se encontró ${selector}.`);
-  return element;
 }
