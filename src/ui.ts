@@ -1,4 +1,5 @@
 // Small DOM helpers shared by the popup and the options page.
+import { previewLines } from "./snippets/model";
 import type { Snippet } from "./snippets/types";
 
 /** Finds an element that must exist in the page; fails loudly if the HTML changed. */
@@ -21,6 +22,14 @@ export function setEmptyState(emptyState: HTMLElement, title: string, detail: st
   if (detailElement) detailElement.textContent = detail;
 }
 
+/** Restarts a CSS animation, even if the element already has the class. */
+export function replayAnimation(element: HTMLElement, className: string): void {
+  element.classList.remove(className);
+  // Reading the layout makes the browser apply the removal before the class comes back.
+  void element.offsetWidth;
+  element.classList.add(className);
+}
+
 /** Builds the shortcut key, the optional name and a short preview of the text. */
 export function snippetSummary(snippet: Snippet): HTMLElement[] {
   const heading = document.createElement("span");
@@ -38,9 +47,20 @@ export function snippetSummary(snippet: Snippet): HTMLElement[] {
     heading.append(name);
   }
 
+  // The preview runs as one paragraph so line breaks don't use up the visible lines;
+  // a "↵" marks where each break was. Screen readers skip the mark and just hear the text.
   const preview = document.createElement("span");
   preview.className = "snippet-preview";
-  preview.textContent = snippet.content;
+  previewLines(snippet.content).forEach((line, index) => {
+    if (index > 0) {
+      const lineBreak = document.createElement("span");
+      lineBreak.className = "line-break";
+      lineBreak.setAttribute("aria-hidden", "true");
+      lineBreak.textContent = "↵";
+      preview.append(" ", lineBreak, " ");
+    }
+    preview.append(line);
+  });
 
   return [heading, preview];
 }

@@ -75,6 +75,14 @@ export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
   );
 }
 
+/** Non-empty lines of a snippet, trimmed. Used to show a one-paragraph preview. */
+export function previewLines(content: string): string[] {
+  return content
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
 export function prepareImport(
   value: unknown,
   existing: Snippet[],

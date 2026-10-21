@@ -117,7 +117,7 @@ Lo que está en `src/snippets/` no depende de Chrome, así que se prueba directa
 
 ### Estilo visual
 
-La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco.
+La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco. Las animaciones son breves y solo confirman acciones (presionar, copiar, guardar, abrir un atajo); sus duraciones están en `--speed-fast` y `--speed`, y se desactivan si el sistema pide reducir el movimiento.
 
 ## Tipografía
 

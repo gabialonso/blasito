@@ -2,7 +2,7 @@
 import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
-import { errorMessage, requiredElement, setEmptyState, snippetSummary } from "../ui";
+import { errorMessage, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
 
 const COPIED_FEEDBACK_MS = 2000;
 
@@ -13,6 +13,7 @@ const status = requiredElement<HTMLElement>("#popup-status");
 const optionsButton = requiredElement<HTMLButtonElement>("#open-options");
 
 let snippets: Snippet[] = [];
+const copiedTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
 optionsButton.addEventListener("click", () => void chrome.runtime.openOptionsPage());
 searchInput.addEventListener("input", renderSnippets);
@@ -69,14 +70,17 @@ async function copySnippet(snippet: Snippet, button: HTMLElement, copyLabel: HTM
     return;
   }
 
-  button.classList.add("is-inverted");
+  replayAnimation(button, "is-inverted");
   copyLabel.textContent = "Copiado";
   showStatus(`Copiaste el texto de ${snippet.shortcut}.`);
 
-  setTimeout(() => {
+  // Copying again restarts the countdown instead of letting the old one cut it short.
+  clearTimeout(copiedTimers.get(button));
+  const timer = setTimeout(() => {
     button.classList.remove("is-inverted");
     copyLabel.textContent = "Copiar";
   }, COPIED_FEEDBACK_MS);
+  copiedTimers.set(button, timer);
 }
 
 /** ↑ and ↓ move between the search field and the results. */
@@ -99,4 +103,5 @@ function showStatus(message: string, isError = false): void {
   status.dataset.kind = isError ? "error" : "success";
   // Success is already visible on the copied item, so screen readers are the only audience.
   status.classList.toggle("sr-only", !isError);
+  replayAnimation(status, "is-announced");
 }
