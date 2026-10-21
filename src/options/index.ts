@@ -4,7 +4,7 @@ import { filterSnippets, looksLikeAWord, ValidationError } from "../snippets/mod
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
 import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
 import { setupEditorResizer } from "./resize";
-import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
+import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../shared/ui";
 
 const SUCCESS_MESSAGE_MS = 4000;
 
@@ -49,9 +49,6 @@ const fieldErrors = {
   shortcut: { input: shortcutInput, message: shortcutError },
   content: { input: contentInput, message: contentError },
 };
-
-// In the one-column layout the editor is below the list and has to be scrolled into view.
-const oneColumnLayout = window.matchMedia("(max-width: 1024px)");
 
 // ---------- State ----------
 
@@ -237,8 +234,9 @@ function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
 
   if (focus) {
     replayAnimation(editor, "is-opening");
-    if (oneColumnLayout.matches) editor.scrollIntoView({ block: "start" });
-    shortcutInput.focus({ preventScroll: !oneColumnLayout.matches });
+    // Focusing scrolls the field into view only when it isn't visible (the one-column layout);
+    // its scroll-margin in the CSS keeps the editor title in view too.
+    shortcutInput.focus();
   }
 }
 
@@ -305,10 +303,12 @@ async function deleteSelected(): Promise<void> {
   if (confirmed) await removeSnippets(ids);
 }
 
+const spanishList = new Intl.ListFormat("es", { type: "conjunction" });
+
 /** "/a, /b y 3 más": names a few shortcuts without making the dialog huge. */
 function listShortcuts(shortcuts: string[], max = 5): string {
-  if (shortcuts.length <= max) return shortcuts.join(", ");
-  return `${shortcuts.slice(0, max).join(", ")} y ${shortcuts.length - max} más`;
+  const shown = shortcuts.length > max ? [...shortcuts.slice(0, max), `${shortcuts.length - max} más`] : shortcuts;
+  return spanishList.format(shown);
 }
 
 async function removeSnippets(ids: string[]): Promise<void> {
@@ -366,7 +366,7 @@ function importMessage({ imported, duplicates, invalid }: ImportResult): string 
   const parts = [`${imported} ${imported === 1 ? "atajo importado" : "atajos importados"}`];
   if (duplicates) parts.push(`${duplicates} ${duplicates === 1 ? "repetido" : "repetidos"}`);
   if (invalid) parts.push(`${invalid} ${invalid === 1 ? "inválido" : "inválidos"}`);
-  return `${parts.join(", ")}.`;
+  return `${spanishList.format(parts)}.`;
 }
 
 function exportSnippets(): void {

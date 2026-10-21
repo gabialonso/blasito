@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.content.config.ts",
-    "package": "npm run build && cp src/assets/fonts/*.txt dist/ && rm -f blasito.zip && cd dist && zip -qr ../blasito.zip .",
+    "package": "npm run build && cp src/shared/fonts/*.txt dist/ && rm -f blasito.zip && cd dist && zip -qr ../blasito.zip .",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },

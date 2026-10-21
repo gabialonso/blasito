@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { prepareImport } from "../src/snippets/model";
-import type { Snippet } from "../src/snippets/types";
+import { prepareImport } from "../../src/snippets/model";
+import type { Snippet } from "../../src/snippets/types";
 
 const existing: Snippet = {
   id: "existing",

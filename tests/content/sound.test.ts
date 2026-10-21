@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { playExpansionSound } from "../src/content/sound";
+import { playExpansionSound } from "../../src/content/sound";
 
 describe("playExpansionSound", () => {
   it("programa un tono breve y cierra el contexto al terminar", () => {

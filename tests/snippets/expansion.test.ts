@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { findExpansion } from "../src/snippets/expansion";
-import type { Snippet } from "../src/snippets/types";
+import { findExpansion } from "../../src/snippets/expansion";
+import type { Snippet } from "../../src/snippets/types";
 
 const hello: Snippet = {
   id: "hello",

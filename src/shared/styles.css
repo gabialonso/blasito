@@ -1,20 +1,20 @@
 @font-face {
   font-family: "Asap";
-  src: url("./assets/fonts/Asap-Variable.woff2") format("woff2");
+  src: url("./fonts/Asap-Variable.woff2") format("woff2");
   font-weight: 100 900;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Hack";
-  src: url("./assets/fonts/Hack-Regular-subset.woff2") format("woff2");
+  src: url("./fonts/Hack-Regular-subset.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Hack";
-  src: url("./assets/fonts/Hack-Bold-subset.woff2") format("woff2");
+  src: url("./fonts/Hack-Bold-subset.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
@@ -22,12 +22,16 @@
 :root {
   /* Brutalist palette: black, white and one yellow.
      Yellow means "you can act here": header, hover and keyboard focus. */
-  --bg: #fff;
-  --ink: #000;
-  --ink-soft: #333;
+  --black: #000;
+  --white: #fff;
   --mark: #ffe500;
   --danger: #b00016;
   --ok: #005c26;
+
+  /* Roles. Components use these, so swapping them inverts a whole block (see .is-inverted). */
+  --bg: var(--white);
+  --ink: var(--black);
+  --ink-soft: #333;
 
   --font-ui: "Asap", system-ui, sans-serif;
   --font-mono: "Hack", ui-monospace, monospace;
@@ -116,6 +120,8 @@ input:focus-visible, textarea:focus-visible { outline: 0; box-shadow: var(--shad
 /* It can grow, but not past half the window, so the buttons below stay reachable. */
 textarea { min-height: 8rem; max-height: 50vh; resize: vertical; }
 .mono-input { font-family: var(--font-mono); font-size: var(--text-small); font-weight: 700; }
+/* When focusing the first field scrolls the page, leave room for the editor title above it. */
+#shortcut { scroll-margin-top: 8rem; }
 
 /* Checkboxes are drawn by hand so they share the thick border of the rest of the UI. */
 input[type="checkbox"] {
@@ -128,7 +134,8 @@ input[type="checkbox"] {
   min-height: 0;
   margin: 0;
   padding: 0;
-  border: var(--border);
+  /* Written out instead of var(--border) so it follows --ink inside an inverted row. */
+  border: 3px solid var(--ink);
   background: transparent;
   cursor: pointer;
 }
@@ -299,14 +306,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .snippet-list { border-top: var(--border); }
 .snippet-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--space-3); padding-left: var(--space-3); border-bottom: var(--border); }
 .snippet-row > input { margin-top: 1rem; }
-.snippet-row.is-inverted > input { border-color: var(--bg); }
-.snippet-row.is-inverted > input:checked { background: var(--bg); }
-.snippet-row.is-inverted > input::before { background: var(--ink); }
 .row-open { display: block; min-width: 0; padding: var(--space-3) var(--space-3) var(--space-4); border: 0; background: transparent; text-align: left; transition: background-color var(--speed-fast); }
-.row-open:hover,
-.row-open:focus-visible { color: var(--ink); background: var(--mark); outline: 0; }
-.row-open:hover .snippet-preview,
-.row-open:focus-visible .snippet-preview { color: var(--ink); }
 
 @media (max-width: 1024px) {
   /* Extra right padding leaves room for the hard shadow. */
@@ -339,10 +339,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   text-align: left;
   transition: background-color var(--speed-fast);
 }
-.popup-item:hover,
-.popup-item:focus-visible { color: var(--ink); background: var(--mark); outline: 0; }
-.popup-item:hover .snippet-preview,
-.popup-item:focus-visible .snippet-preview { color: var(--ink); }
 .popup-item .snippet-heading { flex-wrap: nowrap; }
 .popup-item .shortcut { flex: none; }
 .popup-item .snippet-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -374,18 +370,30 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   * { scrollbar-color: var(--ink) var(--bg); }
 }
 
-/* ---------- Inverted state ----------
-   The row being edited and a just-copied popup item turn black.
-   Kept at the end of the file so it always wins over the yellow hover. */
+/* ---------- Row states ----------
+   Both states only set the color roles; text, keys and checkboxes inside follow them.
+   Inverted comes last so a copied popup item stays black even under the pointer. */
 
+/* Highlighted (hover or keyboard focus): yellow with black text, also inside an inverted row. */
+.row-open:is(:hover, :focus-visible),
+.popup-item:is(:hover, :focus-visible) {
+  --bg: var(--white);
+  --ink: var(--black);
+  --ink-soft: var(--black);
+  color: var(--ink);
+  background: var(--mark);
+  outline: 0;
+}
+
+/* Inverted: the row being edited and a just-copied popup item. */
 .snippet-row.is-inverted,
-.popup-item.is-inverted,
-.popup-item.is-inverted:hover,
-.popup-item.is-inverted:focus-visible { color: var(--bg); background: var(--ink); }
-.is-inverted .snippet-preview,
-.popup-item.is-inverted:hover .snippet-preview,
-.popup-item.is-inverted:focus-visible .snippet-preview { color: var(--bg); }
-.is-inverted .shortcut { border-color: var(--bg); color: var(--bg); background: var(--ink); box-shadow: 2px 2px 0 var(--bg); }
+.popup-item.is-inverted {
+  --bg: var(--black);
+  --ink: var(--white);
+  --ink-soft: var(--white);
+  color: var(--ink);
+  background: var(--bg);
+}
 
 /* ---------- Animations ---------- */
 

@@ -9,8 +9,8 @@ import {
   updateSnippet,
   validateDraft,
   ValidationError,
-} from "../src/snippets/model";
-import type { Snippet, SnippetDraft } from "../src/snippets/types";
+} from "../../src/snippets/model";
+import type { Snippet, SnippetDraft } from "../../src/snippets/types";
 
 const existing: Snippet = {
   id: "one",

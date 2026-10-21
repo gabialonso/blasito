@@ -1,6 +1,6 @@
 // Small DOM helpers shared by the popup and the options page.
-import { previewLines } from "./snippets/model";
-import type { Snippet } from "./snippets/types";
+import { previewLines } from "../snippets/model";
+import type { Snippet } from "../snippets/types";
 
 /** Finds an element that must exist in the page; fails loudly if the HTML changed. */
 export function requiredElement<T extends Element>(selector: string): T {
