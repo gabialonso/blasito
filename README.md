@@ -80,23 +80,44 @@ El script de contenido se ejecuta en todas las páginas porque tiene que detecta
 ## Desarrollo
 
 ```bash
-npm run typecheck
-npm test
-npm run build
+npm install
+npm run typecheck   # revisa los tipos
+npm test            # pruebas de la lógica
+npm run build       # genera dist/
 ```
 
-La lógica de validación y reemplazo vive en `src/snippets/` y no depende de Chrome, por eso se puede probar por separado.
+El proyecto usa TypeScript y Vite, sin frameworks de interfaz: cada pantalla es un HTML con un script que arma la lista con funciones del DOM.
 
 ```text
-public/              manifest.json
-src/content/         integración con los campos de las páginas
-src/options/         pantalla para administrar atajos
-src/popup/           búsqueda rápida
-src/snippets/        modelo, expansión y almacenamiento
-src/ui.ts            utilidades compartidas por popup y configuración
-src/styles.css       estilos y variables visuales
-tests/               pruebas de la lógica
+public/manifest.json   permisos y puntos de entrada de la extensión
+src/snippets/          lógica sin Chrome ni DOM: validar, buscar, importar, expandir
+  types.ts             forma de un atajo
+  model.ts             validación, búsqueda e importación
+  expansion.ts         encuentra un atajo justo antes del cursor
+  storage.ts           guarda y lee en chrome.storage.local
+src/content/           script que corre en cada página
+  index.ts             escucha lo que se escribe y decide si hay que expandir
+  target.ts            qué campos se aceptan y filtro rápido por tecla
+  expand.ts            reemplaza el texto en input/textarea y en contenteditable
+  sound.ts             tono breve al insertar
+src/options/           pantalla «Administrar atajos»
+src/popup/             búsqueda y copia rápida
+src/ui.ts              funciones de DOM compartidas por popup y configuración
+src/styles.css         estilos; los colores y espacios están en variables al principio
+tests/                 pruebas con Vitest
 ```
+
+### Cómo fluye un atajo
+
+1. En **Administrar atajos**, `options/index.ts` llama a `storage.ts`, que valida con `model.ts` y guarda la lista en `chrome.storage.local`.
+2. `content/index.ts` carga la lista al abrir la página y se entera de cada cambio con `watchSnippets`.
+3. Con cada tecla, `mightCompleteShortcut` descarta rápido lo que no puede terminar un atajo. Si puede, `expand.ts` busca el atajo antes del cursor con `findExpansion` y lo reemplaza.
+
+Lo que está en `src/snippets/` no depende de Chrome, así que se prueba directamente. Para cambiar la lógica, empezá por ahí y su prueba en `tests/`.
+
+### Estilo visual
+
+La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco.
 
 ## Tipografía
 
