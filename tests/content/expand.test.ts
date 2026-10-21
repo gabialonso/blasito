@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { expandTextControl, locateTextOffset } from "../src/content/expand";
-import type { Snippet } from "../src/snippets/types";
+import { expandTextControl, locateTextOffset } from "../../src/content/expand";
+import type { Snippet } from "../../src/snippets/types";
 
 const snippet: Snippet = {
   id: "maintenance",

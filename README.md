@@ -113,9 +113,11 @@ src/options/           pantalla «Administrar atajos»
   index.ts             lista, editor, importar/exportar y diálogos
   resize.ts            divisor arrastrable entre lista y editor
 src/popup/             búsqueda y copia rápida
-src/ui.ts              funciones de DOM compartidas por popup y configuración
-src/styles.css         estilos; los colores y espacios están en variables al principio
-tests/                 pruebas con Vitest
+src/shared/            lo que comparten popup y configuración
+  ui.ts                funciones de DOM: buscar elementos, armar la vista previa, flechas
+  styles.css           estilos; colores, espacios y tiempos están en variables al principio
+  fonts/               Asap y Hack con sus licencias
+tests/                 pruebas con Vitest, con las mismas carpetas que src/
 ```
 
 ### Cómo fluye un atajo
@@ -124,11 +126,11 @@ tests/                 pruebas con Vitest
 2. `content/index.ts` carga la lista al abrir la página y se entera de cada cambio con `watchSnippets`.
 3. Con cada tecla, `mightCompleteShortcut` descarta rápido lo que no puede terminar un atajo. Si puede, `expand.ts` busca el atajo antes del cursor con `findExpansion` y lo reemplaza.
 
-Lo que está en `src/snippets/` no depende de Chrome, así que se prueba directamente. Para cambiar la lógica, empezá por ahí y su prueba en `tests/`.
+Lo que está en `src/snippets/` no depende de Chrome, así que se prueba directamente. Para cambiar la lógica, empezá por ahí y su prueba en `tests/snippets/`.
 
 ### Estilo visual
 
-La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco. Las animaciones son breves y solo confirman acciones (presionar, copiar, guardar, abrir un atajo); sus duraciones están en `--speed-fast` y `--speed`, y se desactivan si el sistema pide reducir el movimiento.
+La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/shared/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco. Las animaciones son breves y solo confirman acciones (presionar, copiar, guardar, abrir un atajo); sus duraciones están en `--speed-fast` y `--speed`, y se desactivan si el sistema pide reducir el movimiento.
 
 ## Tipografía
 
@@ -136,4 +138,4 @@ La interfaz usa [Asap](https://github.com/Omnibus-Type/Asap), en su versión var
 
 Los atajos y el campo para escribirlos usan [Hack](https://github.com/source-foundry/Hack), una fuente monoespaciada que distingue con claridad `0/O`, `1/l/I` y los símbolos. Se incluyen los subconjuntos web de Regular y Bold, que cubren los caracteres del español.
 
-Asap tiene licencia SIL Open Font License 1.1 y Hack, licencias MIT y Bitstream Vera. Las fuentes se sirven desde la extensión, sin pedidos externos, y sus archivos y licencias están en `src/assets/fonts/`.
+Asap tiene licencia SIL Open Font License 1.1 y Hack, licencias MIT y Bitstream Vera. Las fuentes se sirven desde la extensión, sin pedidos externos, y sus archivos y licencias están en `src/shared/fonts/`.

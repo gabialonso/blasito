@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { mightCompleteShortcut, supportsInputType } from "../src/content/target";
+import { mightCompleteShortcut, supportsInputType } from "../../src/content/target";
 
 describe("supportsInputType", () => {
   it.each(["text", "search", "email", "url", "tel"])(

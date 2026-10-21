@@ -2,7 +2,7 @@
 import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
-import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
+import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../shared/ui";
 
 const COPIED_FEEDBACK_MS = 2000;
 
