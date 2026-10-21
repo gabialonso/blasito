@@ -15,7 +15,7 @@
         </div>
         <div class="topbar-actions">
           <label class="file-input">
-            <input id="import-file" type="file" accept="application/json,.json" />
+            <input id="import-input" type="file" accept="application/json,.json" />
             <span class="button">Importar</span>
           </label>
           <button id="export-button" class="button" type="button">Exportar</button>
@@ -27,19 +27,19 @@
       <section class="panel list-panel" aria-labelledby="list-title">
         <div class="panel-heading">
           <h1 id="list-title">Tus atajos <span id="snippet-count" class="count">0</span></h1>
-          <button id="new-snippet" class="button primary" type="button">Nuevo atajo</button>
+          <button id="new-button" class="button primary" type="button">Nuevo atajo</button>
         </div>
         <label class="search-field">
           <span class="sr-only">Buscar atajos</span>
           <input id="search" type="search" placeholder="Buscar atajos" />
         </label>
         <p id="list-status" class="status" role="status" aria-live="polite"></p>
-        <div class="list-toolbar">
+        <div id="list-toolbar" class="list-toolbar">
           <label class="select-all-field">
             <input id="select-all" type="checkbox" />
             Seleccionar todos
           </label>
-          <button id="bulk-delete" class="button small danger" type="button" hidden>Eliminar seleccionados</button>
+          <button id="delete-selected-button" class="button small danger" type="button" hidden>Eliminar seleccionados</button>
         </div>
         <ul id="snippet-list" class="snippet-list" aria-labelledby="list-title"></ul>
         <div id="empty-state" class="empty-state">
@@ -56,9 +56,9 @@
           <label>Nombre <span class="hint">Opcional, para encontrarlo después</span><input id="name" name="name" autocomplete="off" /></label>
           <p id="form-status" class="status" role="status" aria-live="polite"></p>
           <div class="form-actions">
-            <button id="submit-label" class="button primary" type="submit">Guardar atajo</button>
-            <button id="cancel-edit" class="button" type="button" hidden>Cancelar</button>
-            <button id="delete-current" class="button danger" type="button" hidden>Eliminar</button>
+            <button id="save-button" class="button primary" type="submit">Guardar atajo</button>
+            <button id="cancel-button" class="button" type="button" hidden>Cancelar</button>
+            <button id="delete-button" class="button danger" type="button" hidden>Eliminar</button>
           </div>
         </form>
       </section>

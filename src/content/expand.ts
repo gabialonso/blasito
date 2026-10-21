@@ -1,6 +1,9 @@
+// Replaces a shortcut right before the caret with its saved text.
+// Text fields (input/textarea) and rich editors (contenteditable) need different code.
 import type { Snippet } from "../snippets/types";
-import { findExpansion, type Expansion } from "../snippets/expansion";
+import { findExpansion } from "../snippets/expansion";
 
+/** The parts of an <input> or <textarea> we use; a plain object can stand in for tests. */
 export interface TextControl {
   value: string;
   selectionStart: number | null;
@@ -10,12 +13,103 @@ export interface TextControl {
   setRangeText(content: string, start: number, end: number, selectionMode?: SelectionMode): void;
 }
 
-export interface TextOffset {
-  nodeIndex: number;
+/** Where a shortcut starts inside a contenteditable: a text node and a position in it. */
+interface EditorMatch {
+  node: Text;
   offset: number;
+  content: string;
 }
 
-export function locateTextOffset(nodes: string[], offset: number): TextOffset | undefined {
+export function expandTextControl(field: TextControl, snippets: Snippet[]): string | undefined {
+  const hasCaret = field.selectionStart !== null && field.selectionStart === field.selectionEnd;
+  if (field.readOnly || field.disabled || !hasCaret) return undefined;
+
+  const expansion = findExpansion(field.value, field.selectionStart!, snippets);
+  if (!expansion) return undefined;
+
+  field.setRangeText(expansion.content, expansion.start, expansion.end, "end");
+  return expansion.content;
+}
+
+export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]): string | undefined {
+  const selection = editor.ownerDocument.getSelection();
+  if (!selection?.rangeCount || !selection.isCollapsed) return undefined;
+
+  const caret = selection.getRangeAt(0);
+  if (!editor.contains(caret.startContainer)) return undefined;
+
+  const match = findMatchBeforeCaret(editor, caret, snippets);
+  if (!match) return undefined;
+
+  // Select the shortcut so the next step replaces it.
+  const shortcutRange = caret.cloneRange();
+  shortcutRange.setStart(match.node, match.offset);
+  selection.removeAllRanges();
+  selection.addRange(shortcutRange);
+
+  if (insertWithEditorCommand(editor.ownerDocument, match.content)) return match.content;
+
+  insertWithRange(editor, selection, shortcutRange, match.content);
+  return match.content;
+}
+
+/**
+ * Preferred way: the browser's own "insertText" command keeps the editor's undo history
+ * and is understood by most rich-text editors.
+ */
+function insertWithEditorCommand(doc: Document, content: string): boolean {
+  try {
+    return doc.execCommand("insertText", false, content);
+  } catch {
+    return false;
+  }
+}
+
+/** Fallback for editors that reject execCommand: edit the DOM directly and announce the change. */
+function insertWithRange(editor: HTMLElement, selection: Selection, range: Range, content: string): void {
+  range.deleteContents();
+  const inserted = document.createTextNode(content);
+  range.insertNode(inserted);
+  range.setStartAfter(inserted);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  editor.dispatchEvent(new InputEvent("input", { bubbles: true, data: content, inputType: "insertReplacementText" }));
+}
+
+function findMatchBeforeCaret(editor: HTMLElement, caret: Range, snippets: Snippet[]): EditorMatch | undefined {
+  // Fast path: if the text node under the caret is longer than every shortcut, the whole
+  // shortcut (and the character before it) is in that node. No need to read the whole editor.
+  const caretNode = caret.startContainer;
+  const longestShortcut = Math.max(...snippets.map((snippet) => snippet.shortcut.length));
+  if (caretNode instanceof Text && caret.startOffset > longestShortcut) {
+    const expansion = findExpansion(caretNode.data, caret.startOffset, snippets);
+    return expansion && { node: caretNode, offset: expansion.start, content: expansion.content };
+  }
+
+  // Slow path: the shortcut may be split across nodes, e.g. "/ho<b>la</b>".
+  // Read all text before the caret, then find which node the match starts in.
+  const beforeCaret = caret.cloneRange();
+  beforeCaret.selectNodeContents(editor);
+  beforeCaret.setEnd(caret.startContainer, caret.startOffset);
+  const text = beforeCaret.toString();
+  const expansion = findExpansion(text, text.length, snippets);
+  if (!expansion) return undefined;
+
+  const textNodes = collectTextNodes(editor);
+  const start = locateTextOffset(textNodes.map((node) => node.data), expansion.start);
+  return start && { node: textNodes[start.nodeIndex], offset: start.offset, content: expansion.content };
+}
+
+function collectTextNodes(root: Node): Text[] {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) nodes.push(node as Text);
+  return nodes;
+}
+
+/** Converts a position in the joined text of several nodes into "node N, position M". */
+export function locateTextOffset(nodes: string[], offset: number): { nodeIndex: number; offset: number } | undefined {
   if (offset < 0) return undefined;
 
   let remaining = offset;
@@ -25,80 +119,4 @@ export function locateTextOffset(nodes: string[], offset: number): TextOffset | 
   }
 
   return undefined;
-}
-
-export function expandTextControl(field: TextControl, snippets: Snippet[]): string | undefined {
-  if (field.readOnly || field.disabled || field.selectionStart === null || field.selectionStart !== field.selectionEnd) {
-    return undefined;
-  }
-
-  const expansion = findExpansion(field.value, field.selectionStart, snippets);
-  if (!expansion) return undefined;
-
-  field.setRangeText(expansion.content, expansion.start, expansion.end, "end");
-  return expansion.content;
-}
-
-export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]): string | undefined {
-  const doc = editor.ownerDocument;
-  const selection = doc.getSelection();
-  if (!selection?.rangeCount || !selection.isCollapsed) return undefined;
-
-  const caret = selection.getRangeAt(0);
-  if (!editor.contains(caret.startContainer)) return undefined;
-
-  const start = findContentEditableExpansion(editor, caret, snippets);
-  if (!start) return undefined;
-  const { expansion } = start;
-
-  const replacement = caret.cloneRange();
-  replacement.setStart(start.node, start.offset);
-  selection.removeAllRanges();
-  selection.addRange(replacement);
-
-  try {
-    if (doc.execCommand("insertText", false, expansion.content)) return expansion.content;
-  } catch {
-    // The Range fallback below covers editors that reject execCommand.
-  }
-
-  replacement.deleteContents();
-  const inserted = doc.createTextNode(expansion.content);
-  replacement.insertNode(inserted);
-  replacement.setStartAfter(inserted);
-  replacement.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(replacement);
-  const InputEventClass = doc.defaultView?.InputEvent;
-  editor.dispatchEvent(InputEventClass ? new InputEventClass("input", { bubbles: true, data: expansion.content, inputType: "insertReplacementText" }) : new Event("input", { bubbles: true }));
-  return expansion.content;
-}
-
-function findContentEditableExpansion(
-  editor: HTMLElement,
-  caret: Range,
-  snippets: Snippet[],
-): { node: Text; offset: number; expansion: Expansion } | undefined {
-  // Fast path: when the caret's text node already holds the longest shortcut plus the
-  // character before it, there is no need to serialize the whole editor.
-  const caretNode = caret.startContainer;
-  const longest = Math.max(...snippets.map((snippet) => snippet.shortcut.length));
-  if (caretNode.nodeType === Node.TEXT_NODE && caret.startOffset > longest) {
-    const expansion = findExpansion((caretNode as Text).data, caret.startOffset, snippets);
-    return expansion && { node: caretNode as Text, offset: expansion.start, expansion };
-  }
-
-  const beforeCaret = caret.cloneRange();
-  beforeCaret.selectNodeContents(editor);
-  beforeCaret.setEnd(caret.startContainer, caret.startOffset);
-  const value = beforeCaret.toString();
-  const expansion = findExpansion(value, value.length, snippets);
-  if (!expansion) return undefined;
-
-  const doc = editor.ownerDocument;
-  const walker = doc.createTreeWalker(editor, doc.defaultView?.NodeFilter.SHOW_TEXT ?? 4);
-  const textNodes: Text[] = [];
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) textNodes.push(node as Text);
-  const start = locateTextOffset(textNodes.map((node) => node.data), expansion.start);
-  return start && { node: textNodes[start.nodeIndex], offset: start.offset, expansion };
 }

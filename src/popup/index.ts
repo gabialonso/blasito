@@ -1,44 +1,32 @@
-import { filterSnippets, parseStoredSnippets } from "../snippets/model";
+// Popup: search saved snippets and copy one to the clipboard.
+import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
-import { getSnippets, STORAGE_KEY } from "../snippets/storage";
-import { requiredElement, snippetSummary } from "../ui";
+import { getSnippets, watchSnippets } from "../snippets/storage";
+import { errorMessage, requiredElement, setEmptyState, snippetSummary } from "../ui";
+
+const COPIED_FEEDBACK_MS = 2000;
 
 const searchInput = requiredElement<HTMLInputElement>("#search");
 const list = requiredElement<HTMLUListElement>("#snippet-list");
 const emptyState = requiredElement<HTMLElement>("#empty-state");
 const status = requiredElement<HTMLElement>("#popup-status");
+const optionsButton = requiredElement<HTMLButtonElement>("#open-options");
+
 let snippets: Snippet[] = [];
 
-requiredElement<HTMLButtonElement>("#open-options").addEventListener("click", () => void chrome.runtime.openOptionsPage());
+optionsButton.addEventListener("click", () => void chrome.runtime.openOptionsPage());
 searchInput.addEventListener("input", renderSnippets);
-searchInput.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowDown") moveFocus(event, 0);
-});
-list.addEventListener("keydown", (event) => {
-  const items = listButtons();
-  const index = items.indexOf(event.target as HTMLButtonElement);
-  if (event.key === "ArrowDown") moveFocus(event, index + 1);
-  if (event.key === "ArrowUp") moveFocus(event, index - 1);
-});
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === "local" && changes[STORAGE_KEY]) {
-    try {
-      snippets = parseStoredSnippets(changes[STORAGE_KEY].newValue);
-      renderSnippets();
-    } catch (error: unknown) {
-      showStatus(messageFrom(error), true);
-    }
-  }
-});
-void loadSnippets();
+searchInput.addEventListener("keydown", handleArrowKeys);
+list.addEventListener("keydown", handleArrowKeys);
+watchSnippets(showSnippets, (error) => showStatus(errorMessage(error), true));
 
-async function loadSnippets(): Promise<void> {
-  try {
-    snippets = await getSnippets();
-    renderSnippets();
-  } catch (error: unknown) {
-    showStatus(messageFrom(error), true);
-  }
+getSnippets()
+  .then(showSnippets)
+  .catch((error: unknown) => showStatus(errorMessage(error), true));
+
+function showSnippets(newSnippets: Snippet[]): void {
+  snippets = newSnippets;
+  renderSnippets();
 }
 
 function renderSnippets(): void {
@@ -46,21 +34,28 @@ function renderSnippets(): void {
   list.replaceChildren(...visibleSnippets.map(renderSnippet));
   list.hidden = visibleSnippets.length === 0;
   emptyState.hidden = visibleSnippets.length > 0;
-  emptyState.querySelector("strong")!.textContent = snippets.length ? "No encontramos ese atajo" : "Todavía no guardaste atajos";
-  emptyState.querySelector("span")!.textContent = snippets.length ? "Probá con otra búsqueda." : "Creá uno para insertar tus textos más rápido.";
+
+  if (snippets.length === 0) {
+    setEmptyState(emptyState, "Todavía no guardaste atajos", "Creá uno para insertar tus textos más rápido.");
+  } else {
+    setEmptyState(emptyState, "No encontramos ese atajo", "Probá con otra búsqueda.");
+  }
 }
 
 function renderSnippet(snippet: Snippet): HTMLLIElement {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "popup-item";
   const summary = document.createElement("span");
   summary.append(...snippetSummary(snippet));
+
   const copyLabel = document.createElement("span");
   copyLabel.className = "copy-label";
   copyLabel.textContent = "Copiar";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "popup-item";
   button.append(summary, copyLabel);
   button.addEventListener("click", () => void copySnippet(snippet, button, copyLabel));
+
   const item = document.createElement("li");
   item.append(button);
   return item;
@@ -69,37 +64,39 @@ function renderSnippet(snippet: Snippet): HTMLLIElement {
 async function copySnippet(snippet: Snippet, button: HTMLElement, copyLabel: HTMLElement): Promise<void> {
   try {
     await navigator.clipboard.writeText(snippet.content);
-    button.classList.add("is-inverted");
-    copyLabel.textContent = "Copiado";
-    setTimeout(() => {
-      button.classList.remove("is-inverted");
-      copyLabel.textContent = "Copiar";
-    }, 2000);
-    showStatus(`Copiaste el texto de ${snippet.shortcut}.`);
   } catch {
     showStatus("No pudimos copiar el texto.", true);
+    return;
   }
+
+  button.classList.add("is-inverted");
+  copyLabel.textContent = "Copiado";
+  showStatus(`Copiaste el texto de ${snippet.shortcut}.`);
+
+  setTimeout(() => {
+    button.classList.remove("is-inverted");
+    copyLabel.textContent = "Copiar";
+  }, COPIED_FEEDBACK_MS);
 }
 
-function moveFocus(event: KeyboardEvent, index: number): void {
-  const items = listButtons();
-  if (!items.length) return;
+/** ↑ and ↓ move between the search field and the results. */
+function handleArrowKeys(event: KeyboardEvent): void {
+  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+
+  const items = [...list.querySelectorAll<HTMLButtonElement>(".popup-item")];
+  if (items.length === 0) return;
   event.preventDefault();
-  if (index < 0) searchInput.focus();
-  else items[Math.min(index, items.length - 1)].focus();
-}
 
-function listButtons(): HTMLButtonElement[] {
-  return [...list.querySelectorAll<HTMLButtonElement>(".popup-item")];
+  // The search field counts as position -1, above the first result.
+  const current = items.indexOf(event.target as HTMLButtonElement);
+  const next = event.key === "ArrowDown" ? Math.min(current + 1, items.length - 1) : current - 1;
+  if (next < 0) searchInput.focus();
+  else items[next].focus();
 }
 
 function showStatus(message: string, isError = false): void {
   status.textContent = message;
   status.dataset.kind = isError ? "error" : "success";
-  // Success is already shown on the item itself; keep the message for screen readers only.
+  // Success is already visible on the copied item, so screen readers are the only audience.
   status.classList.toggle("sr-only", !isError);
-}
-
-function messageFrom(error: unknown): string {
-  return error instanceof Error ? error.message : "No pudimos cargar tus atajos.";
 }
