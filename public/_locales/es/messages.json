@@ -1,0 +1,6 @@
+{
+  "extensionDescription": {
+    "message": "Expansor de texto: escribí un atajo como /hola y Blasito lo reemplaza por tu texto guardado. Local, sin cuentas ni rastreo.",
+    "description": "Shown in Chrome and in the store summary. Max 132 characters."
+  }
+}

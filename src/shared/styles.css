@@ -200,6 +200,17 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .file-input input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .file-input input:focus-visible + .button { outline: 3px solid var(--ink); outline-offset: 3px; }
 
+/* ES/EN switch: two radio buttons drawn as one segmented key. The checked side is inverted. */
+.language-switch { display: inline-flex; margin: 0; padding: 0; border: var(--border); background: var(--white); box-shadow: var(--shadow-small); }
+.language-switch label { display: block; cursor: pointer; }
+.language-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+/* Same height as .button (its min-height minus this border), so it lines up next to Import/Export. */
+.language-switch span { display: flex; align-items: center; min-height: calc(2.75rem - 6px); padding: 0 var(--space-3); font-size: var(--text-small); font-weight: 800; }
+.language-switch label + label span { border-left: var(--border); }
+.language-switch label:hover span { background: var(--mark); }
+.language-switch input:checked + span { color: var(--white); background: var(--black); }
+.language-switch input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 2px; }
+
 /* ---------- Messages ---------- */
 
 .status { padding: var(--space-2) var(--space-3); border: 3px solid var(--ok); border-left-width: 10px; font-weight: 700; }

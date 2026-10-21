@@ -1,12 +1,14 @@
 // Draggable divider between the snippet list and the editor.
 // Works with the mouse (drag) and the keyboard (← → Home End), and remembers the width.
+import { t } from "../shared/i18n";
 
 const STORAGE_KEY = "blasito.editorWidth";
 const MIN_WIDTH = 320;
 const MAX_SHARE = 0.6; // the editor never takes more than 60% of the layout
 const KEY_STEP = 32;
 
-export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): void {
+/** Returns a function that refreshes the spoken width, for when the language changes. */
+export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): () => void {
   setWidth(readSavedWidth() ?? currentWidth());
 
   resizer.addEventListener("pointerdown", (event) => {
@@ -45,13 +47,15 @@ export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): v
   // Keep the width valid when the window gets smaller.
   window.addEventListener("resize", () => setWidth(currentWidth()));
 
+  return () => setWidth(currentWidth());
+
   function setWidth(width: number): void {
     const clamped = Math.round(Math.min(Math.max(width, MIN_WIDTH), maxWidth()));
     layout.style.setProperty("--editor-width", `${clamped}px`);
     resizer.setAttribute("aria-valuemin", String(MIN_WIDTH));
     resizer.setAttribute("aria-valuemax", String(Math.round(maxWidth())));
     resizer.setAttribute("aria-valuenow", String(clamped));
-    resizer.setAttribute("aria-valuetext", `Editor de ${clamped} píxeles de ancho`);
+    resizer.setAttribute("aria-valuetext", t().editorWidthValue(clamped));
   }
 
   function currentWidth(): number {

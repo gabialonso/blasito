@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,23 +9,30 @@
   </head>
   <body class="popup">
     <header class="topbar">
-      <div class="topbar-inner"><span class="wordmark"><img class="logo" src="../shared/logo.svg" alt="" width="1034" height="876" />Blasito</span></div>
+      <div class="topbar-inner">
+        <span class="wordmark"><img class="logo" src="../shared/logo.svg" alt="" width="1034" height="876" />Blasito</span>
+        <fieldset class="language-switch">
+          <legend class="sr-only" data-i18n="language">Language</legend>
+          <label><input type="radio" name="language" value="es" lang="es" aria-label="Español" /><span>ES</span></label>
+          <label><input type="radio" name="language" value="en" lang="en" aria-label="English" /><span>EN</span></label>
+        </fieldset>
+      </div>
     </header>
     <main class="popup-main">
       <label class="search-field">
-        <span class="sr-only">Buscar atajos</span>
-        <input id="search" type="search" placeholder="Buscar atajos" autofocus />
+        <span class="sr-only" data-i18n="searchSnippets">Search snippets</span>
+        <input id="search" type="search" placeholder="Search snippets" data-i18n-placeholder="searchSnippets" autofocus />
       </label>
-      <p id="popup-hint" class="hint">Elegí un atajo para copiar su texto, o apretá Enter para copiar el primero.</p>
+      <p id="popup-hint" class="hint" data-i18n="popupHint">Pick a snippet to copy its text, or press Enter to copy the first one.</p>
       <p id="popup-status" class="status" role="status" aria-live="polite"></p>
-      <ul id="snippet-list" class="snippet-list popup-list" aria-label="Atajos" aria-describedby="popup-hint"></ul>
+      <ul id="snippet-list" class="snippet-list popup-list" aria-label="Snippets" data-i18n-label="snippets" aria-describedby="popup-hint"></ul>
       <div id="empty-state" class="empty-state">
-        <strong>Todavía no guardaste atajos</strong>
-        <span>Creá uno para insertar tus textos más rápido.</span>
+        <strong>You have no snippets yet</strong>
+        <span>Create one to insert your texts faster.</span>
       </div>
     </main>
     <footer class="popup-footer">
-      <button id="open-options" class="button primary" type="button">Administrar atajos</button>
+      <button id="open-options" class="button primary" type="button" data-i18n="manageSnippets">Manage snippets</button>
     </footer>
     <script type="module" src="./index.ts"></script>
   </body>

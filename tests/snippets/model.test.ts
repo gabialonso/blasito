@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { t } from "../../src/shared/i18n";
 import {
   createSnippet,
   filterSnippets,
@@ -38,15 +39,11 @@ describe("validateDraft", () => {
   });
 
   it("explica con palabras simples los campos vacíos o repetidos", () => {
-    expect(() => validateDraft({ name: "Saludo", shortcut: "   ", content: "x" }, [])).toThrow(
-      "Escribí el atajo que querés usar.",
-    );
-    expect(() => validateDraft({ name: "Saludo", shortcut: "/hola", content: "  " }, [])).toThrow(
-      "Escribí el texto que querés guardar.",
-    );
+    expect(() => validateDraft({ name: "Saludo", shortcut: "   ", content: "x" }, [])).toThrow(t().missingShortcut);
+    expect(() => validateDraft({ name: "Saludo", shortcut: "/hola", content: "  " }, [])).toThrow(t().missingContent);
     expect(() =>
       validateDraft({ name: "Saludo", shortcut: " /hello ", content: "x" }, [existing]),
-    ).toThrow("Ya tenés un atajo igual. Elegí otro.");
+    ).toThrow(t().duplicateShortcut);
   });
 
   it("indica qué campo hay que corregir", () => {
@@ -127,9 +124,7 @@ describe("parseStoredSnippets", () => {
   });
 
   it("rechaza datos corruptos sin convertirlos silenciosamente", () => {
-    expect(() => parseStoredSnippets([{ shortcut: "/sin-id" }])).toThrow(
-      "No pudimos leer los atajos guardados.",
-    );
+    expect(() => parseStoredSnippets([{ shortcut: "/sin-id" }])).toThrow(t().unreadableStorage);
   });
 
   it("acepta snippets completos", () => {
