@@ -19,23 +19,27 @@ The store rejects an upload whose version is not higher than the published one.
 
 **Name:** Blasito
 
-**Summary** (manifest description, max 132 characters):
+**Summary** (max 132 characters). It comes from `public/_locales/<language>/messages.json`, so the
+store shows it in the user's language:
 
 > Text expander: type a shortcut like /hi and Blasito replaces it with your saved text. Local-only, no accounts, no tracking.
 
+> Expansor de texto: escribí un atajo como /hola y Blasito lo reemplaza por tu texto guardado. Local, sin cuentas ni rastreo.
+
 **Category:** Productivity → Tools (pick the closest one the dashboard offers).
 
-**Language:** the interface is in Spanish. If the listing is in English, say so in the description.
+**Languages:** English (default) and Spanish. The interface has an ES/EN switch. Fill in the
+English listing first, then add Spanish as a localized listing with the texts and images below.
 
-**Description:**
+**Description (English):**
 
 ```text
 Blasito is a free and open-source text expander. Save the texts you write again and again,
 give each one a short shortcut, and type it anywhere.
 
 HOW IT WORKS
-• Create a snippet: a shortcut such as /hola and the text it should become.
-• Type /hola in any text field or rich editor; Blasito replaces it as soon as you finish.
+• Create a snippet: a shortcut such as /hi and the text it should become.
+• Type /hi in any text field or rich editor; Blasito replaces it as soon as you finish.
 • Or open the toolbar popup, search, and copy a snippet with a click or Enter.
 
 FEATURES
@@ -49,19 +53,46 @@ PRIVATE BY DESIGN
 • No accounts, no servers, no analytics, no network requests.
 • Only the "storage" permission.
 
-The interface is in Spanish.
+Available in English and Spanish. The English translation is new and may contain mistakes;
+corrections are welcome on GitHub.
 Source code (MIT): https://github.com/gabialonso/blasito
 ```
 
-**Images** (in `store/`):
+**Description (Spanish):**
+
+```text
+Blasito es un expansor de texto libre y gratuito. Guardá los textos que escribís una y otra vez,
+dale a cada uno un atajo corto y escribilo en cualquier lugar.
+
+CÓMO FUNCIONA
+• Creá un atajo: por ejemplo /hola y el texto que debe aparecer.
+• Escribí /hola en cualquier campo de texto o editor; Blasito lo reemplaza apenas terminás.
+• O abrí el popup desde la barra, buscá y copiá un texto con un clic o Enter.
+
+FUNCIONES
+• Funciona en campos de texto, áreas de texto y editores contenteditable. Nunca en contraseñas.
+• Lista y editor lado a lado, búsqueda, selección múltiple, importación y exportación en JSON.
+• Pregunta antes de eliminar o descartar cambios; avisa si un atajo es una palabra común.
+• Cómodo con teclado y accesible: alto contraste, foco visible, respeta el movimiento reducido.
+
+PRIVADO POR DISEÑO
+• Tus atajos quedan en tu dispositivo (chrome.storage.local).
+• Sin cuentas, sin servidores, sin analíticas, sin conexiones de red.
+• Solo el permiso "storage".
+
+Disponible en español e inglés.
+Código fuente (MIT): https://github.com/gabialonso/blasito
+```
+
+**Images** (in `store/`). The icon is the same for every language; the rest are in `en/` and `es/`:
 
 | File | Use |
 | --- | --- |
 | `icon-128.png` | Store icon (128×128) |
-| `screenshot-1-expand.png` | Screenshot (1280×800) |
-| `screenshot-2-popup.png` | Screenshot (1280×800) |
-| `screenshot-3-options.png` | Screenshot (1280×800) |
-| `promo-small-440x280.png` | Small promo tile (440×280) |
+| `<language>/screenshot-1-expand.png` | Screenshot (1280×800) |
+| `<language>/screenshot-2-popup.png` | Screenshot (1280×800) |
+| `<language>/screenshot-3-options.png` | Screenshot (1280×800) |
+| `<language>/promo-small-440x280.png` | Small promo tile (440×280) |
 
 **Links:**
 
@@ -100,7 +131,8 @@ current definitions; with the current code, no data leaves the device. Then cert
 - [ ] Version bumped in `public/manifest.json` and `package.json`.
 - [ ] `npm run typecheck && npm test && npm run package` pass.
 - [ ] `dist/` loaded unpacked in Chrome and tried by hand: create a snippet, expand it in a
-      textarea and in a rich editor, copy from the popup, import and export.
+      textarea and in a rich editor, copy from the popup, import and export,
+      and switch between ES and EN.
 - [ ] Upload `blasito.zip`, fill in the listing and privacy tabs, and submit for review.
 
 Broad host access usually means a longer review. The justification above explains why it is needed.
