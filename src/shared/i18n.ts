@@ -1,10 +1,10 @@
-// Interface texts in Spanish and English. The pages choose the language; everything else calls t().
-// No Chrome or DOM here, so the snippet logic can use it too.
+// interface texts in spanish and english. the pages choose the language; everything else calls t().
+// no chrome or dom here, so the snippet logic can use it too.
 
 export type Language = "es" | "en";
 
 const es = {
-  // Static texts, referenced from the HTML with data-i18n attributes.
+  // static texts, referenced from the html with data-i18n attributes.
   optionsTitle: "Blasito · Tus atajos",
   language: "Idioma",
   skipToEditor: "Ir al editor",
@@ -38,7 +38,7 @@ const es = {
   noMatchTitle: "No encontramos ese atajo",
   noMatchDetail: "Probá con otra búsqueda.",
 
-  // Texts built by the page scripts.
+  // texts built by the page scripts.
   editorWidthValue: (pixels: number) => `Editor de ${pixels} píxeles de ancho`,
   selectSnippet: (label: string) => `Seleccionar ${label}`,
   editSnippet: (label: string) => `Editar ${label}`,
@@ -71,7 +71,7 @@ const es = {
   copyFailed: "No pudimos copiar el texto.",
   unexpectedError: "Ocurrió un error inesperado.",
 
-  // Errors from the snippet logic.
+  // errors from the snippet logic.
   missingShortcut: "Escribí el atajo que querés usar.",
   missingContent: "Escribí el texto que querés guardar.",
   duplicateShortcut: "Ya tenés un atajo igual. Elegí otro.",
@@ -171,7 +171,6 @@ export function getLanguage(): Language {
   return current;
 }
 
-/** Texts in the current language. */
 export function t(): Messages {
   return messages[current];
 }

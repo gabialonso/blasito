@@ -15,6 +15,6 @@ export function playExpansionSound(createContext: () => AudioContext = () => new
     oscillator.start(context.currentTime);
     oscillator.stop(end);
   } catch {
-    // The sound is optional: if the browser blocks it, the replacement still happens.
+    // the sound is optional: if the browser blocks it, the replacement still happens.
   }
 }

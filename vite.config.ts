@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
-// Extension pages (popup and options). The content script has its own build in
-// vite.content.config.ts because it can't be an ES module.
+// extension pages (popup and options). the content script has its own build in
+// vite.content.config.ts because it can't be an es module.
 
 export default defineConfig({
   build: {

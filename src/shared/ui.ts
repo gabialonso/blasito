@@ -1,23 +1,19 @@
-// Small DOM helpers shared by the popup and the options page.
 import { previewLines } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getLanguage, isLanguage, setLanguage, t, type Language, type Messages } from "./i18n";
 
 const LANGUAGE_KEY = "blasito.language";
 
-/** Finds an element that must exist in the page; fails loudly if the HTML changed. */
 export function requiredElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
   if (!element) throw new Error(`Missing element: ${selector}`);
   return element;
 }
 
-/** Turns anything thrown into a message that can be shown to the user. */
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : t().unexpectedError;
 }
 
-/** Fills the "nothing to show" box: a title and one line explaining what to do. */
 export function setEmptyState(emptyState: HTMLElement, title: string, detail: string): void {
   const titleElement = emptyState.querySelector("strong");
   const detailElement = emptyState.querySelector("span");
@@ -41,15 +37,14 @@ export function handleArrowKeys(event: KeyboardEvent, items: HTMLElement[], star
   else items[next].focus();
 }
 
-/** Restarts a CSS animation, even if the element already has the class. */
+/** restarts a css animation, even if the element already has the class. */
 export function replayAnimation(element: HTMLElement, className: string): void {
   element.classList.remove(className);
-  // Reading the layout makes the browser apply the removal before the class comes back.
+  // reading the layout makes the browser apply the removal before the class comes back.
   void element.offsetWidth;
   element.classList.add(className);
 }
 
-/** Builds the shortcut key, the optional name and a short preview of the text. */
 export function snippetSummary(snippet: Snippet): HTMLElement[] {
   const heading = document.createElement("span");
   heading.className = "snippet-heading";
@@ -66,8 +61,8 @@ export function snippetSummary(snippet: Snippet): HTMLElement[] {
     heading.append(name);
   }
 
-  // The preview runs as one paragraph so line breaks don't use up the visible lines;
-  // a "↵" marks where each break was. Screen readers skip the mark and just hear the text.
+  // the preview runs as one paragraph so line breaks don't use up the visible lines;
+  // a "↵" marks where each break was. screen readers skip the mark and just hear the text.
   const preview = document.createElement("span");
   preview.className = "snippet-preview";
   previewLines(snippet.content).forEach((line, index) => {
@@ -85,7 +80,7 @@ export function snippetSummary(snippet: Snippet): HTMLElement[] {
 }
 
 /**
- * Wires the ES/EN switch and applies the saved language (or the browser's, the first time).
+ * wires the es/en switch and applies the saved language (or the browser's, the first time).
  * `onChange` re-renders the texts that the page script builds itself.
  */
 export function setupLanguageSwitch(onChange: () => void): void {
@@ -105,7 +100,7 @@ export function setupLanguageSwitch(onChange: () => void): void {
       apply(input.value);
     });
   }
-  // The popup and the options page share localStorage, so a change in one reaches the other.
+  // the popup and the options page share localStorage, so a change in one reaches the other.
   window.addEventListener("storage", (event) => {
     if (event.key === LANGUAGE_KEY && isLanguage(event.newValue)) apply(event.newValue);
   });
@@ -113,7 +108,7 @@ export function setupLanguageSwitch(onChange: () => void): void {
   apply(savedLanguage());
 }
 
-/** Fills the elements marked in the HTML: data-i18n (text), data-i18n-placeholder, -label and -title. */
+/** fills the elements marked in the html: data-i18n (text), data-i18n-placeholder, -label and -title. */
 function translatePage(): void {
   document.documentElement.lang = getLanguage();
   for (const element of document.querySelectorAll<HTMLElement>("[data-i18n]")) {
@@ -141,13 +136,13 @@ function savedLanguage(): Language {
     const saved = localStorage.getItem(LANGUAGE_KEY);
     if (isLanguage(saved)) return saved;
   } catch {
-    // Storage blocked: fall back to the browser's language.
+    // storage blocked: fall back to the browser's language.
   }
   return navigator.language.toLowerCase().startsWith("es") ? "es" : "en";
 }
 
 function saveLanguage(language: Language): void {
-  // Only a preference: if storage is blocked, the language just isn't remembered.
+  // only a preference: if storage is blocked, the language just isn't remembered.
   try {
     localStorage.setItem(LANGUAGE_KEY, language);
   } catch {

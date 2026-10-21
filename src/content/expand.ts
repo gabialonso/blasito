@@ -1,9 +1,8 @@
-// Replaces a shortcut right before the caret with its saved text.
-// Text fields (input/textarea) and rich editors (contenteditable) need different code.
+// text fields (input/textarea) and rich editors (contenteditable) need different code.
 import type { Snippet } from "../snippets/types";
 import { findExpansion } from "../snippets/expansion";
 
-/** The parts of an <input> or <textarea> we use; a plain object can stand in for tests. */
+/** the parts of an <input> or <textarea> we use; a plain object can stand in for tests. */
 export interface TextControl {
   value: string;
   selectionStart: number | null;
@@ -13,7 +12,6 @@ export interface TextControl {
   setRangeText(content: string, start: number, end: number, selectionMode?: SelectionMode): void;
 }
 
-/** Where a shortcut starts inside a contenteditable: a text node and a position in it. */
 interface EditorMatch {
   node: Text;
   offset: number;
@@ -41,7 +39,7 @@ export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]):
   const match = findMatchBeforeCaret(editor, caret, snippets);
   if (!match) return undefined;
 
-  // Select the shortcut so the next step replaces it.
+  // select the shortcut so the next step replaces it.
   const shortcutRange = caret.cloneRange();
   shortcutRange.setStart(match.node, match.offset);
   selection.removeAllRanges();
@@ -54,7 +52,7 @@ export function expandContentEditable(editor: HTMLElement, snippets: Snippet[]):
 }
 
 /**
- * Preferred way: the browser's own "insertText" command keeps the editor's undo history
+ * preferred way: the browser's own "insertText" command keeps the editor's undo history
  * and is understood by most rich-text editors.
  */
 function insertWithEditorCommand(doc: Document, content: string): boolean {
@@ -65,7 +63,7 @@ function insertWithEditorCommand(doc: Document, content: string): boolean {
   }
 }
 
-/** Fallback for editors that reject execCommand: edit the DOM directly and announce the change. */
+/** fallback for editors that reject execCommand: edit the dom directly and announce the change. */
 function insertWithRange(editor: HTMLElement, selection: Selection, range: Range, content: string): void {
   range.deleteContents();
   const inserted = document.createTextNode(content);
@@ -78,8 +76,8 @@ function insertWithRange(editor: HTMLElement, selection: Selection, range: Range
 }
 
 function findMatchBeforeCaret(editor: HTMLElement, caret: Range, snippets: Snippet[]): EditorMatch | undefined {
-  // Fast path: if the text node under the caret is longer than every shortcut, the whole
-  // shortcut (and the character before it) is in that node. No need to read the whole editor.
+  // fast path: if the text node under the caret is longer than every shortcut, the whole
+  // shortcut (and the character before it) is in that node. no need to read the whole editor.
   const caretNode = caret.startContainer;
   const longestShortcut = Math.max(...snippets.map((snippet) => snippet.shortcut.length));
   if (caretNode instanceof Text && caret.startOffset > longestShortcut) {
@@ -87,8 +85,8 @@ function findMatchBeforeCaret(editor: HTMLElement, caret: Range, snippets: Snipp
     return expansion && { node: caretNode, offset: expansion.start, content: expansion.content };
   }
 
-  // Slow path: the shortcut may be split across nodes, e.g. "/ho<b>la</b>".
-  // Read all text before the caret, then find which node the match starts in.
+  // slow path: the shortcut may be split across nodes, e.g. "/ho<b>la</b>".
+  // read all text before the caret, then find which node the match starts in.
   const beforeCaret = caret.cloneRange();
   beforeCaret.selectNodeContents(editor);
   beforeCaret.setEnd(caret.startContainer, caret.startOffset);
@@ -108,7 +106,6 @@ function collectTextNodes(root: Node): Text[] {
   return nodes;
 }
 
-/** Converts a position in the joined text of several nodes into "node N, position M". */
 export function locateTextOffset(nodes: string[], offset: number): { nodeIndex: number; offset: number } | undefined {
   if (offset < 0) return undefined;
 
