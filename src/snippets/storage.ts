@@ -27,11 +27,6 @@ export async function editSnippet(id: string, draft: SnippetDraft): Promise<Snip
   return updated;
 }
 
-export async function deleteSnippet(id: string): Promise<void> {
-  const snippets = await getSnippets();
-  await saveSnippets(snippets.filter((snippet) => snippet.id !== id));
-}
-
 export async function deleteSnippets(ids: string[]): Promise<void> {
   const snippets = await getSnippets();
   const idSet = new Set(ids);

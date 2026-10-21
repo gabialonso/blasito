@@ -8,86 +8,59 @@
   </head>
   <body class="options-page">
     <header class="topbar">
-      <strong>Blasito - Gestor de atajos</strong>
+      <div class="topbar-inner">
+        <div class="topbar-copy">
+          <span class="wordmark">Blasito</span>
+          <p>Escribí un atajo en cualquier campo de texto y Blasito lo reemplaza por el texto guardado.</p>
+        </div>
+        <div class="topbar-actions">
+          <label class="file-input">
+            <input id="import-file" type="file" accept="application/json,.json" />
+            <span class="button">Importar</span>
+          </label>
+          <button id="export-button" class="button" type="button">Exportar</button>
+        </div>
+      </div>
     </header>
 
     <main class="options-layout">
-      <section class="panel editor-panel" aria-labelledby="editor-title">
-        <div class="section-heading">
-          <h1 id="editor-title">Crear nuevo atajo</h1>
-        </div>
-        <form id="snippet-form">
-          <label>Nombre del atajo <span class="hint">Opcional, para reconocerlo</span><input id="name" name="name" autocomplete="off" placeholder="Respuesta de bienvenida" /></label>
-          <label>Atajo <span class="hint">Lo que vas a escribir para insertarlo</span><input id="shortcut" name="shortcut" autocomplete="off" placeholder="/hola" required /></label>
-          <label>Texto guardado <span class="hint">Lo que Blasito va a insertar</span><textarea id="content" name="content" rows="9" placeholder="Hola, ¿cómo estás?" required></textarea></label>
-          <p id="form-status" class="status" role="status" aria-live="polite"></p>
-          <div class="form-actions">
-            <button class="button primary" type="submit">
-              <svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              <span id="submit-label">Guardar atajo</span>
-            </button>
-            <button id="cancel-edit" class="button secondary" type="button" hidden>
-              <svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Cancelar
-            </button>
-          </div>
-        </form>
-
-        <section class="import-panel" aria-labelledby="import-title">
-          <h2 id="import-title">Importar y exportar</h2>
-          <div class="import-scroll">
-            <div class="io-block">
-              <p>Elegí un archivo JSON con una lista de atajos. Los repetidos se saltean.</p>
-              <label class="file-input">
-                <span>Archivo JSON</span>
-                <input id="import-file" type="file" accept="application/json,.json" />
-                <span class="button secondary">
-                  <svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  Elegir archivo
-                </span>
-              </label>
-              <p id="import-status" class="status" role="status" aria-live="polite"></p>
-            </div>
-            <div class="io-block">
-              <p>Descargá un archivo JSON con los atajos que tenés guardados ahora.</p>
-              <button id="export-button" class="button secondary" type="button">
-                <svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Descargar atajos
-              </button>
-              <p id="export-status" class="status" role="status" aria-live="polite"></p>
-            </div>
-          </div>
-        </section>
-      </section>
-
       <section class="panel list-panel" aria-labelledby="list-title">
-        <div class="section-heading list-heading">
-          <h2 id="list-title">Tus atajos</h2>
-          <span id="snippet-count" class="count">0</span>
+        <div class="panel-heading">
+          <h1 id="list-title">Tus atajos <span id="snippet-count" class="count">0</span></h1>
+          <button id="new-snippet" class="button primary" type="button">Nuevo atajo</button>
         </div>
         <label class="search-field">
           <span class="sr-only">Buscar atajos</span>
-          <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="search" type="search" placeholder="Buscar por nombre, atajo o texto" />
+          <input id="search" type="search" placeholder="Buscar atajos" />
         </label>
+        <p id="list-status" class="status" role="status" aria-live="polite"></p>
         <div class="list-toolbar">
           <label class="select-all-field">
             <input id="select-all" type="checkbox" />
-            <span>Seleccionar todo</span>
+            Seleccionar todos
           </label>
-          <button id="bulk-delete" class="text-button danger" type="button" hidden>
-            <svg class="feather" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-            <span id="bulk-delete-label">Eliminar seleccionados</span>
-          </button>
+          <button id="bulk-delete" class="button small danger" type="button" hidden>Eliminar seleccionados</button>
         </div>
-        <p id="list-status" class="status" role="status" aria-live="polite"></p>
-        <div class="list-scroll">
-          <ul id="snippet-list" class="snippet-list"></ul>
-          <div id="empty-state" class="empty-state">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <strong>Todavía no guardaste atajos</strong><span>Creá el primero con el formulario.</span>
+        <ul id="snippet-list" class="snippet-list" aria-labelledby="list-title"></ul>
+        <div id="empty-state" class="empty-state">
+          <strong>Todavía no guardaste atajos</strong>
+          <span>Tocá «Nuevo atajo» para crear el primero.</span>
+        </div>
+      </section>
+
+      <section id="editor" class="panel editor-panel" aria-labelledby="editor-title">
+        <h2 id="editor-title">Nuevo atajo</h2>
+        <form id="snippet-form">
+          <label>Atajo <span class="hint">Lo que vas a escribir, por ejemplo /hola</span><input id="shortcut" class="mono-input" name="shortcut" autocomplete="off" spellcheck="false" required /></label>
+          <label>Texto guardado <span class="hint">Lo que aparece en lugar del atajo</span><textarea id="content" name="content" rows="5" required></textarea></label>
+          <label>Nombre <span class="hint">Opcional, para encontrarlo después</span><input id="name" name="name" autocomplete="off" /></label>
+          <p id="form-status" class="status" role="status" aria-live="polite"></p>
+          <div class="form-actions">
+            <button id="submit-label" class="button primary" type="submit">Guardar atajo</button>
+            <button id="cancel-edit" class="button" type="button" hidden>Cancelar</button>
+            <button id="delete-current" class="button danger" type="button" hidden>Eliminar</button>
           </div>
-        </div>
+        </form>
       </section>
     </main>
     <script type="module" src="./index.ts"></script>
