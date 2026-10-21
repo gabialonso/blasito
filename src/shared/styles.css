@@ -20,15 +20,15 @@
 }
 
 :root {
-  /* Brutalist palette: black, white and one yellow.
-     Yellow means "you can act here": header, hover and keyboard focus. */
+  /* brutalist palette: black, white and one yellow.
+     yellow means "you can act here": header, hover and keyboard focus. */
   --black: #000;
   --white: #fff;
   --mark: #ffe500;
   --danger: #b00016;
   --ok: #005c26;
 
-  /* Roles. Components use these, so swapping them inverts a whole block (see .is-inverted). */
+  /* roles. components use these, so swapping them inverts a whole block (see .is-inverted). */
   --bg: var(--white);
   --ink: var(--black);
   --ink-soft: #333;
@@ -50,16 +50,12 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
 
-  /* Motion: short and snappy, only to confirm what changed. */
   --speed-fast: 120ms;
   --speed: 220ms;
   --ease-out: cubic-bezier(.2, .8, .2, 1);
 
-  /* Light theme only for now; a dark theme will come later. */
   color-scheme: light;
 }
-
-/* ---------- Base ---------- */
 
 * { box-sizing: border-box; }
 body { min-width: 20rem; margin: 0; color: var(--ink); background: var(--bg); font: 400 var(--text-body)/1.5 var(--font-ui); }
@@ -71,7 +67,6 @@ button { cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 [hidden] { display: none !important; }
 
-/* Hidden until it gets keyboard focus; then it appears at the top-left corner. */
 .skip-link {
   position: absolute;
   top: var(--space-2);
@@ -85,8 +80,6 @@ button { cursor: pointer; }
   transform: translateY(-200%);
 }
 .skip-link:focus { transform: none; }
-
-/* ---------- Header ---------- */
 
 .topbar { background: var(--mark); border-bottom: var(--border); }
 .topbar-inner {
@@ -103,8 +96,6 @@ button { cursor: pointer; }
 .topbar p { font-weight: 500; }
 .topbar-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 
-/* ---------- Form controls ---------- */
-
 form { display: grid; gap: var(--space-5); }
 label { display: grid; gap: var(--space-1); font-weight: 700; }
 .hint { color: var(--ink-soft); font-size: var(--text-small); font-weight: 400; }
@@ -118,13 +109,13 @@ input, textarea {
 }
 input::placeholder, textarea::placeholder { color: var(--ink-soft); opacity: 1; }
 input:focus-visible, textarea:focus-visible { outline: 0; box-shadow: var(--shadow); }
-/* It can grow, but not past half the window, so the buttons below stay reachable. */
+/* it can grow, but not past half the window, so the buttons below stay reachable. */
 textarea { min-height: 8rem; max-height: 50vh; resize: vertical; }
 .mono-input { font-family: var(--font-mono); font-size: var(--text-small); font-weight: 700; }
-/* When focusing the first field scrolls the page, leave room for the editor title above it. */
+/* when focusing the first field scrolls the page, leave room for the editor title above it. */
 #shortcut { scroll-margin-top: 8rem; }
 
-/* Checkboxes are drawn by hand so they share the thick border of the rest of the UI. */
+/* checkboxes are drawn by hand so they share the thick border of the rest of the ui. */
 input[type="checkbox"] {
   appearance: none;
   display: inline-grid;
@@ -135,7 +126,7 @@ input[type="checkbox"] {
   min-height: 0;
   margin: 0;
   padding: 0;
-  /* Written out instead of var(--border) so it follows --ink inside an inverted row. */
+  /* written out instead of var(--border) so it follows --ink inside an inverted row. */
   border: 3px solid var(--ink);
   background: transparent;
   cursor: pointer;
@@ -154,9 +145,6 @@ input[type="checkbox"]:indeterminate { background: var(--ink); }
 input[type="checkbox"]:checked::before { transform: scale(1); }
 input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; transform: scale(1); }
 
-/* ---------- Buttons ---------- */
-
-/* Solid blocks with a hard shadow that "press" in when clicked. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -172,7 +160,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .button:hover,
 .button:focus-visible,
 .file-input:hover .button { color: var(--ink); background: var(--mark); }
-/* Lift slightly on hover and press flat on click, like a physical key. */
 .button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
 .button:active { box-shadow: none; transform: translate(3px, 3px); }
 .button.danger:hover { box-shadow: 4px 4px 0 var(--danger); }
@@ -187,7 +174,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 
 .button.small { min-height: 2.25rem; padding: 0 var(--space-3); font-size: var(--text-small); }
 
-/* On the yellow header a yellow hover would be invisible, so header buttons invert instead. */
+/* on the yellow header a yellow hover would be invisible, so header buttons invert instead. */
 .topbar .button:hover,
 .topbar .button:focus-visible,
 .topbar .file-input:hover .button { color: var(--bg); background: var(--ink); }
@@ -195,23 +182,20 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .form-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .form-actions .danger { margin-left: auto; }
 
-/* The real file input is hidden; the styled span next to it is what people see. */
+/* the real file input is hidden; the styled span next to it is what people see. */
 .file-input { display: inline-flex; cursor: pointer; }
 .file-input input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .file-input input:focus-visible + .button { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-/* ES/EN switch: two radio buttons drawn as one segmented key. The checked side is inverted. */
 .language-switch { display: inline-flex; margin: 0; padding: 0; border: var(--border); background: var(--white); box-shadow: var(--shadow-small); }
 .language-switch label { display: block; cursor: pointer; }
 .language-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-/* Same height as .button (its min-height minus this border), so it lines up next to Import/Export. */
+/* same height as .button (its min-height minus this border), so it lines up next to import/export. */
 .language-switch span { display: flex; align-items: center; min-height: calc(2.75rem - 6px); padding: 0 var(--space-3); font-size: var(--text-small); font-weight: 800; }
 .language-switch label + label span { border-left: var(--border); }
 .language-switch label:hover span { background: var(--mark); }
 .language-switch input:checked + span { color: var(--white); background: var(--black); }
 .language-switch input:focus-visible + span { outline: 3px solid var(--ink); outline-offset: 2px; }
-
-/* ---------- Messages ---------- */
 
 .status { padding: var(--space-2) var(--space-3); border: 3px solid var(--ok); border-left-width: 10px; font-weight: 700; }
 .status.is-announced { animation: slide-in var(--speed) var(--ease-out); }
@@ -221,12 +205,9 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .empty-state strong { font-size: 1.25rem; font-weight: 800; }
 .empty-state span { color: var(--ink-soft); }
 
-/* Field errors sit right under their field, pulled up into the form gap. */
 .field-error { margin-top: calc(var(--space-3) - var(--space-5)); padding-left: var(--space-2); border-left: 6px solid var(--danger); color: var(--danger); font-weight: 700; }
 .field-error.is-announced { animation: slide-in var(--speed) var(--ease-out); }
 [aria-invalid="true"] { border-color: var(--danger); box-shadow: 4px 4px 0 var(--danger); }
-
-/* ---------- Confirmation dialog ---------- */
 
 .dialog {
   width: min(28rem, calc(100vw - 2rem));
@@ -241,9 +222,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .dialog form { gap: var(--space-4); }
 .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-3); }
 
-/* ---------- Snippet summary (popup and options list) ---------- */
-
-/* Shortcuts look like keyboard keys: this is what you type. */
 .shortcut {
   display: inline-block;
   padding: 0 var(--space-2);
@@ -270,9 +248,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .line-break { font-family: var(--font-mono); font-weight: 700; }
 .snippet-list { margin: 0; padding: 0; list-style: none; }
 
-/* ---------- Options page ---------- */
-
-/* Full width: the list takes all the space the editor leaves. The editor width is set by
+/* full width: the list takes all the space the editor leaves. the editor width is set by
    dragging the divider between them (see options/resize.ts). */
 .options-layout {
   display: grid;
@@ -283,7 +259,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 }
 .panel { border: var(--border); background: var(--bg); box-shadow: var(--shadow); }
 
-/* The divider is a small grip that stays in view while the page scrolls. */
 .panel-resizer {
   position: sticky;
   top: 40vh;
@@ -299,8 +274,8 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .panel-resizer:focus-visible,
 .panel-resizer.is-dragging { background-color: var(--mark); }
 .list-panel { display: grid; gap: var(--space-4); padding: var(--space-5); }
-/* The editor follows the scroll, and never gets taller than the window: if its content
-   doesn't fit, the editor scrolls on its own so "Guardar" is always reachable. */
+/* the editor follows the scroll, and never gets taller than the window: if its content
+   doesn't fit, the editor scrolls on its own so "guardar" is always reachable. */
 .editor-panel {
   position: sticky;
   top: var(--space-5);
@@ -321,7 +296,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .row-open { display: block; min-width: 0; padding: var(--space-3) var(--space-3) var(--space-4); border: 0; background: transparent; text-align: left; transition: background-color var(--speed-fast); }
 
 @media (max-width: 1024px) {
-  /* Extra right padding leaves room for the hard shadow. */
+  /* extra right padding leaves room for the hard shadow. */
   .panel-resizer { display: none; }
   .options-layout { grid-template-columns: 1fr; gap: var(--space-5); padding: var(--space-4) var(--space-5) var(--space-4) var(--space-3); }
   .panel { box-shadow: 4px 4px 0 var(--ink); }
@@ -330,8 +305,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   .topbar-inner { padding: var(--space-3) var(--space-4); }
   .wordmark { font-size: 1.875rem; }
 }
-
-/* ---------- Popup ---------- */
 
 .popup { width: 25rem; }
 .popup .topbar-inner { padding: var(--space-3) var(--space-4); }
@@ -354,26 +327,22 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .popup-item .snippet-heading { flex-wrap: nowrap; }
 .popup-item .shortcut { flex: none; }
 .popup-item .snippet-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* One line that fills the row, cut with "…" wherever it ends. */
 .popup-item .snippet-preview { display: block; white-space: nowrap; text-overflow: ellipsis; }
 .copy-label { padding-top: .2rem; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; }
 .popup-footer { padding: 0 var(--space-4) var(--space-4); }
 .popup-footer .button { width: 100%; }
 
-/* ---------- Scrollbars ----------
-   Square, thick-bordered and yellow on hover, like the rest of the UI.
-   Chromium ignores ::-webkit-scrollbar when scrollbar-color/scrollbar-width are set,
-   so the standard properties are only a fallback for browsers without it (Firefox). */
+/* square, thick-bordered and yellow on hover, like the rest of the ui.
+   chromium ignores ::-webkit-scrollbar when scrollbar-color/scrollbar-width are set,
+   so the standard properties are only a fallback for browsers without it (firefox). */
 
 ::-webkit-scrollbar { width: 16px; height: 16px; }
 ::-webkit-scrollbar-track { background: var(--bg); border-left: 3px solid var(--ink); }
-/* The transparent border leaves a gap around the thumb; the left side keeps the track line. */
 ::-webkit-scrollbar-thumb { border: 3px solid transparent; border-left-color: var(--ink); background: var(--ink) padding-box; }
-/* Yellow alone would barely show on white, so the hovered thumb gets a full black outline. */
+/* yellow alone would barely show on white, so the hovered thumb gets a full black outline. */
 ::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:active { border-color: var(--ink); background: var(--mark) padding-box; }
 ::-webkit-scrollbar-corner { background: var(--bg); }
-/* Horizontal bars: the track line goes on top instead of the left. */
 ::-webkit-scrollbar-track:horizontal { border-top: 3px solid var(--ink); border-left: 0; }
 ::-webkit-scrollbar-thumb:horizontal { border-left-color: transparent; border-top-color: var(--ink); }
 ::-webkit-scrollbar-thumb:horizontal:hover { border-color: var(--ink); }
@@ -382,11 +351,9 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   * { scrollbar-color: var(--ink) var(--bg); }
 }
 
-/* ---------- Row states ----------
-   Both states only set the color roles; text, keys and checkboxes inside follow them.
-   Inverted comes last so a copied popup item stays black even under the pointer. */
+/* both states only set the color roles; text, keys and checkboxes inside follow them.
+   inverted comes last so a copied popup item stays black even under the pointer. */
 
-/* Highlighted (hover or keyboard focus): yellow with black text, also inside an inverted row. */
 .row-open:is(:hover, :focus-visible),
 .popup-item:is(:hover, :focus-visible) {
   --bg: var(--white);
@@ -397,7 +364,6 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   outline: 0;
 }
 
-/* Inverted: the row being edited and a just-copied popup item. */
 .snippet-row.is-inverted,
 .popup-item.is-inverted {
   --bg: var(--black);
@@ -407,31 +373,24 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   background: var(--bg);
 }
 
-/* ---------- Animations ---------- */
-
-/* A message slides in so it is noticed. */
 @keyframes slide-in {
   from { opacity: 0; transform: translateX(-12px); }
 }
 
-/* A copied item is "stamped": it drops into place. */
 @keyframes stamp {
   from { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 var(--mark); }
 }
 .popup-item.is-inverted { animation: stamp var(--speed) var(--ease-out); }
 
-/* The confirmation dialog drops in from above. */
 @keyframes drop-in {
   from { opacity: 0; transform: translateY(-16px); }
 }
 
-/* The editor nudges when a snippet opens in it, to show its content changed. */
 @keyframes nudge {
   from { transform: translate(-6px, -6px); box-shadow: 12px 12px 0 var(--ink); }
 }
 .editor-panel.is-opening { animation: nudge var(--speed) var(--ease-out); }
 
-/* A just-saved row flashes yellow, then fades back. */
 @keyframes flash {
   from { background: var(--mark); }
 }

@@ -1,5 +1,3 @@
-// Options page: list of snippets on the left, editor on the right.
-// Picking a row opens it in the editor; "New snippet" clears the editor.
 import { filterSnippets, looksLikeAWord, ValidationError } from "../snippets/model";
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
 import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
@@ -16,8 +14,6 @@ import {
 } from "../shared/ui";
 
 const SUCCESS_MESSAGE_MS = 4000;
-
-// ---------- Page elements ----------
 
 const skipLink = requiredElement<HTMLAnchorElement>("#skip-to-editor");
 const importInput = requiredElement<HTMLInputElement>("#import-input");
@@ -53,23 +49,17 @@ const confirmTitle = requiredElement<HTMLElement>("#confirm-title");
 const confirmMessage = requiredElement<HTMLElement>("#confirm-message");
 const confirmButton = requiredElement<HTMLButtonElement>("#confirm-button");
 
-/** Fields that can show their own error, with the element where the message goes. */
 const fieldErrors = {
   shortcut: { input: shortcutInput, message: shortcutError },
   content: { input: contentInput, message: contentError },
 };
 
-// ---------- State ----------
-
 let snippets: Snippet[] = [];
-/** Snippet open in the editor, or undefined while creating a new one. */
 let editing: Snippet | undefined;
-/** Snippet saved a moment ago; its row flashes once on the next render. */
+// the row flashes once after a save.
 let justSavedId: string | undefined;
 const selectedIds = new Set<string>();
 const messageTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
-
-// ---------- Events ----------
 
 skipLink.addEventListener("click", (event) => {
   event.preventDefault();
@@ -89,21 +79,19 @@ form.addEventListener("submit", (event) => {
   void saveForm();
 });
 cancelButton.addEventListener("click", () => void switchEditor(undefined));
-// Esc leaves the editor, asking first if something would be lost.
 form.addEventListener("keydown", (event) => {
   if (event.key !== "Escape" || !(editing || hasUnsavedChanges())) return;
-  // Without this, the same Esc press would also close the dialog that switchEditor opens.
+  // without this, the same esc press would also close the dialog that switchEditor opens.
   event.preventDefault();
   void switchEditor(undefined);
 });
-// An error disappears as soon as the user starts fixing that field.
 shortcutInput.addEventListener("input", () => clearFieldError("shortcut"));
 contentInput.addEventListener("input", () => clearFieldError("content"));
 deleteButton.addEventListener("click", () => void deleteEditing());
 
 const refreshResizer = setupEditorResizer(layout, resizer);
 setupLanguageSwitch(() => {
-  // Messages already shown stay in the old language, so they go away.
+  // messages already shown stay in the old language, so they go away.
   for (const status of [listStatus, formStatus]) status.textContent = "";
   clearFieldError("shortcut");
   clearFieldError("content");
@@ -113,8 +101,6 @@ setupLanguageSwitch(() => {
 });
 void loadSnippets();
 
-// ---------- Loading and rendering ----------
-
 async function loadSnippets(): Promise<void> {
   try {
     snippets = await getSnippets();
@@ -123,7 +109,6 @@ async function loadSnippets(): Promise<void> {
     return;
   }
 
-  // Forget selected snippets that no longer exist.
   for (const id of selectedIds) {
     if (!snippets.some((snippet) => snippet.id === id)) selectedIds.delete(id);
   }
@@ -158,7 +143,6 @@ function renderRow(snippet: Snippet): HTMLLIElement {
     renderSelectionToolbar(filterSnippets(snippets, searchInput.value));
   });
 
-  // The whole row is one button that opens the snippet in the editor.
   const openButton = document.createElement("button");
   openButton.type = "button";
   openButton.className = "row-open";
@@ -180,7 +164,7 @@ function renderRow(snippet: Snippet): HTMLLIElement {
 function renderSelectionToolbar(visibleSnippets: Snippet[]): void {
   const visibleSelected = visibleSnippets.filter((snippet) => selectedIds.has(snippet.id)).length;
 
-  // A disabled checkbox is hard to see, so the toolbar disappears when there is nothing to select.
+  // a disabled checkbox is hard to see, so the toolbar disappears when there is nothing to select.
   listToolbar.hidden = visibleSnippets.length === 0 && selectedIds.size === 0;
   selectAllInput.checked = visibleSnippets.length > 0 && visibleSelected === visibleSnippets.length;
   selectAllInput.indeterminate = visibleSelected > 0 && visibleSelected < visibleSnippets.length;
@@ -200,11 +184,7 @@ function selectVisible(selected: boolean): void {
   renderList();
 }
 
-// ---------- Editor ----------
-
-/** Like openEditor, but first asks before throwing away unsaved changes. */
 async function switchEditor(snippet: Snippet | undefined): Promise<void> {
-  // Picking the row that is already open just goes back to the editor.
   if (snippet && snippet.id === editing?.id) {
     shortcutInput.focus();
     return;
@@ -217,7 +197,6 @@ async function switchEditor(snippet: Snippet | undefined): Promise<void> {
   openEditor(snippet);
 }
 
-/** True when the form differs from the snippet being edited (or from an empty form). */
 function hasUnsavedChanges(): boolean {
   return (
     shortcutInput.value !== (editing?.shortcut ?? "") ||
@@ -226,7 +205,6 @@ function hasUnsavedChanges(): boolean {
   );
 }
 
-/** Shows `snippet` in the editor, or an empty form for a new one when it is undefined. */
 function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
   editing = snippet;
   form.reset();
@@ -247,8 +225,8 @@ function openEditor(snippet: Snippet | undefined, { focus = true } = {}): void {
 
   if (focus) {
     replayAnimation(editor, "is-opening");
-    // Focusing scrolls the field into view only when it isn't visible (the one-column layout);
-    // its scroll-margin in the CSS keeps the editor title in view too.
+    // focusing scrolls the field into view only when it isn't visible (the one-column layout);
+    // its scroll-margin in the css keeps the editor title in view too.
     shortcutInput.focus();
   }
 }
@@ -288,8 +266,8 @@ async function saveForm(): Promise<void> {
 }
 
 /**
- * A shortcut like "ok" is also a normal word, so it would expand while writing a sentence.
- * Saving it is allowed, but only after a warning (and only when the shortcut is new or changed).
+ * a shortcut like "ok" is also a normal word, so it would expand while writing a sentence.
+ * saving it is allowed, but only after a warning (and only when the shortcut is new or changed).
  */
 async function confirmWordShortcut(shortcut: string): Promise<boolean> {
   if (!looksLikeAWord(shortcut) || shortcut === editing?.shortcut) return true;
@@ -298,8 +276,6 @@ async function confirmWordShortcut(shortcut: string): Promise<boolean> {
   if (!confirmed) shortcutInput.focus();
   return confirmed;
 }
-
-// ---------- Deleting ----------
 
 async function deleteEditing(): Promise<void> {
   if (!editing) return;
@@ -316,7 +292,6 @@ async function deleteSelected(): Promise<void> {
   if (confirmed) await removeSnippets(ids);
 }
 
-/** "/a, /b and 3 more": names a few shortcuts without making the dialog huge. */
 function listShortcuts(shortcuts: string[], max = 5): string {
   const shown = shortcuts.length > max ? [...shortcuts.slice(0, max), t().more(shortcuts.length - max)] : shortcuts;
   return formatList(shown);
@@ -334,12 +309,12 @@ async function removeSnippets(ids: string[]): Promise<void> {
   if (editing && ids.includes(editing.id)) openEditor(undefined, { focus: false });
   await loadSnippets();
   showMessage(listStatus, t().deleted(ids.length));
-  // The focused button no longer exists; move keyboard users back to the list.
+  // the focused button no longer exists; move keyboard users back to the list.
   searchInput.focus();
 }
 
 /**
- * Opens the page's own confirmation dialog (instead of window.confirm).
+ * opens the page's own confirmation dialog (instead of window.confirm).
  * `action` is the label of the destructive button; resolves to true only if it is pressed.
  */
 function askConfirmation(title: string, message: string, action: string): Promise<boolean> {
@@ -348,19 +323,17 @@ function askConfirmation(title: string, message: string, action: string): Promis
   confirmButton.textContent = action;
 
   return new Promise((resolve) => {
-    // returnValue is the value of the button that closed the dialog; Esc leaves it empty.
+    // `returnValue` is the value of the button that closed the dialog; esc leaves it empty.
     confirmDialog.returnValue = "";
     confirmDialog.addEventListener("close", () => resolve(confirmDialog.returnValue === "confirm"), { once: true });
     confirmDialog.showModal();
   });
 }
 
-// ---------- Import and export ----------
-
 async function importFile(): Promise<void> {
   const [file] = importInput.files ?? [];
   if (!file) return;
-  // Clear the input so choosing the same file again still triggers "change".
+  // clear the input so choosing the same file again still triggers "change".
   importInput.value = "";
 
   try {
@@ -396,8 +369,6 @@ function exportSnippets(): void {
   showMessage(listStatus, t().exported(snippets.length));
 }
 
-// ---------- Messages ----------
-
 function showFieldError(field: keyof typeof fieldErrors, message: string): void {
   const { input, message: messageElement } = fieldErrors[field];
   input.setAttribute("aria-invalid", "true");
@@ -413,7 +384,6 @@ function clearFieldError(field: keyof typeof fieldErrors): void {
   message.hidden = true;
 }
 
-/** Shows a message under a section. Success messages fade after a few seconds; errors stay. */
 function showMessage(element: HTMLElement, message: string, isError = false): void {
   element.textContent = message;
   element.dataset.kind = isError ? "error" : "success";

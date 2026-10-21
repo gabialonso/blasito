@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
-// Second build, only for the content script. Chrome loads content scripts as classic
-// scripts, not ES modules, so it is bundled alone as one IIFE file: dist/content.js.
+// second build, only for the content script. chrome loads content scripts as classic
+// scripts, not es modules, so it is bundled alone as one iife file: dist/content.js.
 
 export default defineConfig({
   publicDir: false,

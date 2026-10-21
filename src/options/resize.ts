@@ -1,13 +1,11 @@
-// Draggable divider between the snippet list and the editor.
-// Works with the mouse (drag) and the keyboard (← → Home End), and remembers the width.
 import { t } from "../shared/i18n";
 
 const STORAGE_KEY = "blasito.editorWidth";
 const MIN_WIDTH = 320;
-const MAX_SHARE = 0.6; // the editor never takes more than 60% of the layout
+const MAX_SHARE = 0.6;
 const KEY_STEP = 32;
 
-/** Returns a function that refreshes the spoken width, for when the language changes. */
+/** returns a function that refreshes the spoken width, for when the language changes. */
 export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): () => void {
   setWidth(readSavedWidth() ?? currentWidth());
 
@@ -19,7 +17,7 @@ export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): (
 
   resizer.addEventListener("pointermove", (event) => {
     if (!resizer.hasPointerCapture(event.pointerId)) return;
-    // The editor is on the right, so its width is the distance from the pointer to the right edge.
+    // the editor is on the right, so its width is the distance from the pointer to the right edge.
     const right = layout.getBoundingClientRect().right - parseFloat(getComputedStyle(layout).paddingRight);
     setWidth(right - event.clientX - resizer.offsetWidth / 2);
   });
@@ -44,7 +42,6 @@ export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): (
     saveWidth();
   });
 
-  // Keep the width valid when the window gets smaller.
   window.addEventListener("resize", () => setWidth(currentWidth()));
 
   return () => setWidth(currentWidth());
@@ -67,7 +64,7 @@ export function setupEditorResizer(layout: HTMLElement, resizer: HTMLElement): (
   }
 
   function saveWidth(): void {
-    // Only a visual preference: if storage is blocked, the width just isn't remembered.
+    // only a visual preference: if storage is blocked, the width just isn't remembered.
     try {
       localStorage.setItem(STORAGE_KEY, String(currentWidth()));
     } catch {

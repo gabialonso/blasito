@@ -1,7 +1,7 @@
 import { t } from "../shared/i18n";
 import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
-/** A draft that can't be saved, with the field that needs fixing. */
+/** a draft that can't be saved, with the field that needs fixing. */
 export class ValidationError extends Error {
   constructor(
     message: string,
@@ -88,14 +88,13 @@ export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
 }
 
 /**
- * True for shortcuts made only of letters and numbers, like "ok" or "hola".
- * They also match normal words while typing, so the UI warns before saving them.
+ * true for shortcuts made only of letters and numbers, like "ok" or "hola".
+ * they also match normal words while typing, so the ui warns before saving them.
  */
 export function looksLikeAWord(shortcut: string): boolean {
   return /^[\p{L}\p{N}]+$/u.test(shortcut.trim());
 }
 
-/** Non-empty lines of a snippet, trimmed. Used to show a one-paragraph preview. */
 export function previewLines(content: string): string[] {
   return content
     .split("\n")
