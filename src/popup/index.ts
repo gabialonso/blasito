@@ -2,7 +2,7 @@
 import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
-import { errorMessage, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
+import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../ui";
 
 const COPIED_FEEDBACK_MS = 2000;
 
@@ -17,8 +17,14 @@ const copiedTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
 optionsButton.addEventListener("click", () => void chrome.runtime.openOptionsPage());
 searchInput.addEventListener("input", renderSnippets);
-searchInput.addEventListener("keydown", handleArrowKeys);
-list.addEventListener("keydown", handleArrowKeys);
+searchInput.addEventListener("keydown", moveWithArrows);
+// Enter in the search copies the first result: type a few letters, press Enter, done.
+searchInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  list.querySelector<HTMLButtonElement>(".popup-item")?.click();
+});
+list.addEventListener("keydown", moveWithArrows);
 watchSnippets(showSnippets, (error) => showStatus(errorMessage(error), true));
 
 getSnippets()
@@ -83,19 +89,8 @@ async function copySnippet(snippet: Snippet, button: HTMLElement, copyLabel: HTM
   copiedTimers.set(button, timer);
 }
 
-/** ↑ and ↓ move between the search field and the results. */
-function handleArrowKeys(event: KeyboardEvent): void {
-  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-
-  const items = [...list.querySelectorAll<HTMLButtonElement>(".popup-item")];
-  if (items.length === 0) return;
-  event.preventDefault();
-
-  // The search field counts as position -1, above the first result.
-  const current = items.indexOf(event.target as HTMLButtonElement);
-  const next = event.key === "ArrowDown" ? Math.min(current + 1, items.length - 1) : current - 1;
-  if (next < 0) searchInput.focus();
-  else items[next].focus();
+function moveWithArrows(event: KeyboardEvent): void {
+  handleArrowKeys(event, [...list.querySelectorAll<HTMLButtonElement>(".popup-item")], searchInput);
 }
 
 function showStatus(message: string, isError = false): void {

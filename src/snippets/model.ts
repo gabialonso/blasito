@@ -1,17 +1,28 @@
 import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
+/** A draft that can't be saved, with the field that needs fixing. */
+export class ValidationError extends Error {
+  constructor(
+    message: string,
+    readonly field: keyof SnippetDraft,
+  ) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 export function validateDraft(draft: SnippetDraft, snippets: Snippet[], currentId?: string): SnippetDraft {
   const shortcut = draft.shortcut.trim();
   if (!shortcut) {
-    throw new Error("Escribí el atajo que querés usar.");
+    throw new ValidationError("Escribí el atajo que querés usar.", "shortcut");
   }
 
   if (!draft.content.trim()) {
-    throw new Error("Escribí el contenido que querés guardar.");
+    throw new ValidationError("Escribí el texto que querés guardar.", "content");
   }
 
   if (snippets.some((snippet) => snippet.shortcut === shortcut && snippet.id !== currentId)) {
-    throw new Error("Ya guardaste un atajo igual.");
+    throw new ValidationError("Ya tenés un atajo igual. Elegí otro.", "shortcut");
   }
 
   const name = draft.name?.trim();
@@ -73,6 +84,14 @@ export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
       value?.toLocaleLowerCase().includes(normalizedQuery),
     ),
   );
+}
+
+/**
+ * True for shortcuts made only of letters and numbers, like "ok" or "hola".
+ * They also match normal words while typing, so the UI warns before saving them.
+ */
+export function looksLikeAWord(shortcut: string): boolean {
+  return /^[\p{L}\p{N}]+$/u.test(shortcut.trim());
 }
 
 /** Non-empty lines of a snippet, trimmed. Used to show a one-paragraph preview. */
