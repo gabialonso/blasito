@@ -98,7 +98,8 @@ button { cursor: pointer; }
   padding: var(--space-4) var(--space-5);
 }
 .topbar-copy { display: grid; gap: var(--space-1); max-width: 46rem; }
-.wordmark { font-size: 2.25rem; font-weight: 900; line-height: 1; letter-spacing: -.03em; }
+.wordmark { display: inline-flex; align-items: center; gap: .3em; font-size: 2.25rem; font-weight: 900; line-height: 1; letter-spacing: -.03em; }
+.wordmark .logo { width: auto; height: 1.15em; }
 .topbar p { font-weight: 500; }
 .topbar-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 

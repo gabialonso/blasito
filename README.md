@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="src/shared/logo-white.svg" />
+  <img src="src/shared/logo.svg" alt="" width="96" />
+</picture>
+
 # Blasito
 
 **A local-first text expander for Chromium.** Type a shortcut like `/hola` in any text field and Blasito replaces it with the text you saved. No accounts, no servers, no tracking.
@@ -81,7 +86,7 @@ src/
   content/             content script that runs in web pages
   options/             «Administrar atajos» page and its resizable divider
   popup/               search and quick copy
-  shared/              DOM helpers, styles and fonts used by popup and options
+  shared/              DOM helpers, styles, fonts and logo (black and white SVG) used by popup and options
 tests/                 same folders as src/
 store/                 Chrome Web Store images
 docs/                  publishing notes
