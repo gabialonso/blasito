@@ -1,66 +1,69 @@
-import { parseStoredSnippets } from "../snippets/model";
+// Runs inside every page. Watches what the user types and replaces a shortcut
+// with its saved text as soon as the last character of the shortcut is typed.
 import type { Snippet } from "../snippets/types";
-import { getSnippets, STORAGE_KEY } from "../snippets/storage";
+import { getSnippets, watchSnippets } from "../snippets/storage";
 import { expandContentEditable, expandTextControl } from "./expand";
 import { playExpansionSound } from "./sound";
 import { mightCompleteShortcut, supportsInputType } from "./target";
 
 let snippets: Snippet[] = [];
+// Last character of every shortcut, used to skip most keystrokes cheaply.
 let lastCharacters = new Set<string>();
-let replacing = false;
+// Replacing text fires a new "input" event; this flag stops us from handling our own change.
+let isReplacing = false;
 
-void getSnippets()
+getSnippets()
   .then(setSnippets)
-  .catch((error: unknown) => {
-    console.error("Blasito no pudo cargar los snippets.", error);
-  });
+  .catch((error: unknown) => console.error("Blasito no pudo cargar los atajos.", error));
 
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName !== "local" || !changes[STORAGE_KEY]) {
-    return;
-  }
+watchSnippets(setSnippets, (error) => console.error("Blasito recibió atajos inválidos.", error));
 
-  try {
-    setSnippets(parseStoredSnippets(changes[STORAGE_KEY].newValue));
-  } catch (error: unknown) {
-    console.error("Blasito recibió snippets inválidos.", error);
-  }
-});
+document.addEventListener("input", handleInput);
 
-function setSnippets(storedSnippets: Snippet[]): void {
-  snippets = storedSnippets;
-  lastCharacters = new Set(storedSnippets.map((snippet) => snippet.shortcut.at(-1)!));
+function setSnippets(newSnippets: Snippet[]): void {
+  snippets = newSnippets;
+  lastCharacters = new Set(newSnippets.map((snippet) => snippet.shortcut.at(-1)!));
 }
 
-document.addEventListener("input", (event) => {
-  if (replacing || !snippets.length) return;
+function handleInput(event: Event): void {
+  if (isReplacing || snippets.length === 0) return;
+
   const { inputType, data } = event as Partial<InputEvent>;
   if (!mightCompleteShortcut(inputType, data, lastCharacters)) return;
 
-  const field = isTextControl(event.target) ? event.target : contentEditableHost(event.target);
-  if (!field) return;
-
+  isReplacing = true;
   try {
-    replacing = true;
-    const content = isTextControl(field) ? expandTextControl(field, snippets) : expandContentEditable(field, snippets);
-    if (!content) return;
-
-    playExpansionSound();
-    if (isTextControl(field)) {
-      field.dispatchEvent(new InputEvent("input", { bubbles: true, data: content, inputType: "insertReplacementText" }));
-    }
+    const inserted = expandTarget(event.target);
+    if (inserted) playExpansionSound();
   } finally {
-    replacing = false;
+    isReplacing = false;
   }
-});
+}
+
+/** Expands a shortcut in the field that received the input. Returns the inserted text, if any. */
+function expandTarget(target: EventTarget | null): string | undefined {
+  if (isTextControl(target)) {
+    const inserted = expandTextControl(target, snippets);
+    // setRangeText does not fire "input", and frameworks like React need it to see the new value.
+    if (inserted) {
+      target.dispatchEvent(new InputEvent("input", { bubbles: true, data: inserted, inputType: "insertReplacementText" }));
+    }
+    return inserted;
+  }
+
+  const editor = contentEditableHost(target);
+  return editor ? expandContentEditable(editor, snippets) : undefined;
+}
 
 function isTextControl(target: EventTarget | null): target is HTMLInputElement | HTMLTextAreaElement {
   return target instanceof HTMLTextAreaElement || (target instanceof HTMLInputElement && supportsInputType(target.type));
 }
 
+/** Returns the outermost editable element, which is the whole editor (not just the paragraph typed in). */
 function contentEditableHost(target: EventTarget | null): HTMLElement | undefined {
-  let element = target instanceof HTMLElement ? target : undefined;
-  if (!element?.isContentEditable) return undefined;
-  while (element.parentElement?.isContentEditable) element = element.parentElement;
-  return element;
+  if (!(target instanceof HTMLElement) || !target.isContentEditable) return undefined;
+
+  let editor = target;
+  while (editor.parentElement?.isContentEditable) editor = editor.parentElement;
+  return editor;
 }
