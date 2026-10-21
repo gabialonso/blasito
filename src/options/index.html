@@ -1,26 +1,31 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blasito · Tus atajos</title>
+    <title data-i18n="optionsTitle">Blasito · Your snippets</title>
     <link rel="icon" href="/icons/icon-32.png" />
     <link rel="stylesheet" href="../shared/styles.css" />
   </head>
   <body class="options-page">
-    <a id="skip-to-editor" class="skip-link" href="#editor">Ir al editor</a>
+    <a id="skip-to-editor" class="skip-link" href="#editor" data-i18n="skipToEditor">Skip to editor</a>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="topbar-copy">
           <span class="wordmark"><img class="logo" src="../shared/logo.svg" alt="" width="1034" height="876" />Blasito</span>
-          <p>Escribí un atajo en cualquier campo de texto y Blasito lo reemplaza por el texto guardado.</p>
+          <p data-i18n="tagline">Type a shortcut in any text field and Blasito replaces it with your saved text.</p>
         </div>
         <div class="topbar-actions">
+          <fieldset class="language-switch">
+            <legend class="sr-only" data-i18n="language">Language</legend>
+            <label><input type="radio" name="language" value="es" lang="es" aria-label="Español" /><span>ES</span></label>
+            <label><input type="radio" name="language" value="en" lang="en" aria-label="English" /><span>EN</span></label>
+          </fieldset>
           <label class="file-input">
             <input id="import-input" type="file" accept="application/json,.json" />
-            <span class="button">Importar</span>
+            <span class="button" data-i18n="import">Import</span>
           </label>
-          <button id="export-button" class="button" type="button">Exportar</button>
+          <button id="export-button" class="button" type="button" data-i18n="export">Export</button>
         </div>
       </div>
     </header>
@@ -28,26 +33,26 @@
     <main class="options-layout">
       <section class="panel list-panel" aria-labelledby="list-title">
         <div class="panel-heading">
-          <h1 id="list-title">Tus atajos <span id="snippet-count" class="count">0</span></h1>
-          <button id="new-button" class="button primary" type="button">Nuevo atajo</button>
+          <h1 id="list-title"><span data-i18n="listTitle">Your snippets</span> <span id="snippet-count" class="count">0</span></h1>
+          <button id="new-button" class="button primary" type="button" data-i18n="newSnippet">New snippet</button>
         </div>
         <label class="search-field">
-          <span class="sr-only">Buscar atajos</span>
-          <input id="search" type="search" placeholder="Buscar atajos" aria-describedby="list-keys-hint" />
+          <span class="sr-only" data-i18n="searchSnippets">Search snippets</span>
+          <input id="search" type="search" placeholder="Search snippets" data-i18n-placeholder="searchSnippets" aria-describedby="list-keys-hint" />
         </label>
-        <p id="list-keys-hint" class="sr-only">Con las flechas arriba y abajo te movés entre los atajos.</p>
+        <p id="list-keys-hint" class="sr-only" data-i18n="listKeysHint">Use the up and down arrows to move between snippets.</p>
         <p id="list-status" class="status" role="status" aria-live="polite"></p>
         <div id="list-toolbar" class="list-toolbar">
           <label class="select-all-field">
             <input id="select-all" type="checkbox" />
-            Seleccionar todos
+            <span data-i18n="selectAll">Select all</span>
           </label>
-          <button id="delete-selected-button" class="button small danger" type="button" hidden>Eliminar seleccionados</button>
+          <button id="delete-selected-button" class="button small danger" type="button" hidden>Delete selected</button>
         </div>
         <ul id="snippet-list" class="snippet-list" aria-labelledby="list-title"></ul>
         <div id="empty-state" class="empty-state">
-          <strong>Todavía no guardaste atajos</strong>
-          <span>Tocá «Nuevo atajo» para crear el primero.</span>
+          <strong>You have no snippets yet</strong>
+          <span>Press “New snippet” to create your first one.</span>
         </div>
       </section>
 
@@ -56,39 +61,41 @@
         class="panel-resizer"
         role="separator"
         aria-orientation="vertical"
-        aria-label="Ancho del editor"
+        aria-label="Editor width"
+        data-i18n-label="editorWidth"
         aria-controls="editor"
         tabindex="0"
-        title="Arrastrá para cambiar el ancho del editor"
+        title="Drag to change the editor width"
+        data-i18n-title="resizerHint"
       ></div>
 
       <section id="editor" class="panel editor-panel" aria-labelledby="editor-title">
-        <h2 id="editor-title">Nuevo atajo</h2>
+        <h2 id="editor-title">New snippet</h2>
         <!-- novalidate: errors are shown by the page, not by the browser's bubbles. -->
         <form id="snippet-form" novalidate>
-          <label>Atajo <span class="hint">Lo que vas a escribir, por ejemplo /hola</span><input id="shortcut" class="mono-input" name="shortcut" autocomplete="off" spellcheck="false" required aria-describedby="shortcut-error" /></label>
+          <label><span data-i18n="shortcut">Shortcut</span> <span class="hint" data-i18n="shortcutHint">What you will type, for example /hi</span><input id="shortcut" class="mono-input" name="shortcut" autocomplete="off" spellcheck="false" required aria-describedby="shortcut-error" /></label>
           <p id="shortcut-error" class="field-error" hidden></p>
-          <label>Texto guardado <span class="hint">Lo que aparece en lugar del atajo</span><textarea id="content" name="content" rows="5" required aria-describedby="content-error"></textarea></label>
+          <label><span data-i18n="content">Saved text</span> <span class="hint" data-i18n="contentHint">What appears instead of the shortcut</span><textarea id="content" name="content" rows="5" required aria-describedby="content-error"></textarea></label>
           <p id="content-error" class="field-error" hidden></p>
-          <label>Nombre <span class="hint">Opcional, para encontrarlo después</span><input id="name" name="name" autocomplete="off" /></label>
+          <label><span data-i18n="name">Name</span> <span class="hint" data-i18n="nameHint">Optional, to find it later</span><input id="name" name="name" autocomplete="off" /></label>
           <p id="form-status" class="status" role="status" aria-live="polite"></p>
           <div class="form-actions">
-            <button id="save-button" class="button primary" type="submit">Guardar atajo</button>
-            <button id="cancel-button" class="button" type="button" hidden>Cancelar</button>
-            <button id="delete-button" class="button danger" type="button" hidden>Eliminar</button>
+            <button id="save-button" class="button primary" type="submit">Save snippet</button>
+            <button id="cancel-button" class="button" type="button" hidden data-i18n="cancel">Cancel</button>
+            <button id="delete-button" class="button danger" type="button" hidden data-i18n="delete">Delete</button>
           </div>
         </form>
       </section>
     </main>
 
-    <!-- Confirmation dialog: replaces window.confirm. Esc or "Cancelar" closes it without acting. -->
+    <!-- Confirmation dialog: replaces window.confirm. Esc or "Cancel" closes it without acting. -->
     <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
       <form method="dialog">
-        <h2 id="confirm-title">¿Eliminar?</h2>
+        <h2 id="confirm-title">Delete?</h2>
         <p id="confirm-message"></p>
         <div class="dialog-actions">
-          <button class="button" value="cancel" autofocus>Cancelar</button>
-          <button id="confirm-button" class="button danger" value="confirm">Eliminar</button>
+          <button class="button" value="cancel" autofocus data-i18n="cancel">Cancel</button>
+          <button id="confirm-button" class="button danger" value="confirm">Delete</button>
         </div>
       </form>
     </dialog>

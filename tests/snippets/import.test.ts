@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { t } from "../../src/shared/i18n";
 import { prepareImport } from "../../src/snippets/model";
 import type { Snippet } from "../../src/snippets/types";
 
@@ -74,8 +75,6 @@ describe("prepareImport", () => {
   });
 
   it("rechaza un archivo cuya raíz no sea una lista de atajos", () => {
-    expect(() => prepareImport({ otraClave: [] }, [existing])).toThrow(
-      "El archivo debe contener una lista de atajos.",
-    );
+    expect(() => prepareImport({ otraClave: [] }, [existing])).toThrow(t().notAList);
   });
 });

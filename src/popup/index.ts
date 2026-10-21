@@ -2,7 +2,16 @@
 import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
-import { errorMessage, handleArrowKeys, replayAnimation, requiredElement, setEmptyState, snippetSummary } from "../shared/ui";
+import { t } from "../shared/i18n";
+import {
+  errorMessage,
+  handleArrowKeys,
+  replayAnimation,
+  requiredElement,
+  setEmptyState,
+  setupLanguageSwitch,
+  snippetSummary,
+} from "../shared/ui";
 
 const COPIED_FEEDBACK_MS = 2000;
 
@@ -25,6 +34,10 @@ searchInput.addEventListener("keydown", (event) => {
   list.querySelector<HTMLButtonElement>(".popup-item")?.click();
 });
 list.addEventListener("keydown", moveWithArrows);
+setupLanguageSwitch(() => {
+  status.textContent = "";
+  renderSnippets();
+});
 watchSnippets(showSnippets, (error) => showStatus(errorMessage(error), true));
 
 getSnippets()
@@ -43,9 +56,9 @@ function renderSnippets(): void {
   emptyState.hidden = visibleSnippets.length > 0;
 
   if (snippets.length === 0) {
-    setEmptyState(emptyState, "Todavía no guardaste atajos", "Creá uno para insertar tus textos más rápido.");
+    setEmptyState(emptyState, t().emptyTitle, t().emptyPopupDetail);
   } else {
-    setEmptyState(emptyState, "No encontramos ese atajo", "Probá con otra búsqueda.");
+    setEmptyState(emptyState, t().noMatchTitle, t().noMatchDetail);
   }
 }
 
@@ -55,7 +68,7 @@ function renderSnippet(snippet: Snippet): HTMLLIElement {
 
   const copyLabel = document.createElement("span");
   copyLabel.className = "copy-label";
-  copyLabel.textContent = "Copiar";
+  copyLabel.textContent = t().copy;
 
   const button = document.createElement("button");
   button.type = "button";
@@ -72,19 +85,19 @@ async function copySnippet(snippet: Snippet, button: HTMLElement, copyLabel: HTM
   try {
     await navigator.clipboard.writeText(snippet.content);
   } catch {
-    showStatus("No pudimos copiar el texto.", true);
+    showStatus(t().copyFailed, true);
     return;
   }
 
   replayAnimation(button, "is-inverted");
-  copyLabel.textContent = "Copiado";
-  showStatus(`Copiaste el texto de ${snippet.shortcut}.`);
+  copyLabel.textContent = t().copied;
+  showStatus(t().copiedStatus(snippet.shortcut));
 
   // Copying again restarts the countdown instead of letting the old one cut it short.
   clearTimeout(copiedTimers.get(button));
   const timer = setTimeout(() => {
     button.classList.remove("is-inverted");
-    copyLabel.textContent = "Copiar";
+    copyLabel.textContent = t().copy;
   }, COPIED_FEEDBACK_MS);
   copiedTimers.set(button, timer);
 }

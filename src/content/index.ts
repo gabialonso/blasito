@@ -14,9 +14,9 @@ let isReplacing = false;
 
 getSnippets()
   .then(setSnippets)
-  .catch((error: unknown) => console.error("Blasito no pudo cargar los atajos.", error));
+  .catch((error: unknown) => console.error("Blasito could not load the snippets.", error));
 
-watchSnippets(setSnippets, (error) => console.error("Blasito recibió atajos inválidos.", error));
+watchSnippets(setSnippets, (error) => console.error("Blasito received invalid snippets.", error));
 
 document.addEventListener("input", handleInput);
 

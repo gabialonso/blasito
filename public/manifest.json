@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "Blasito",
   "version": "1.0.0",
-  "description": "Text expander: type a shortcut like /hi and Blasito replaces it with your saved text. Local-only, no accounts, no tracking.",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "homepage_url": "https://github.com/gabialonso/blasito",
   "minimum_chrome_version": "92",
   "icons": {
