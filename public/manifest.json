@@ -1,11 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Blasito",
-  "version": "0.1.0",
-  "description": "Expansión local de snippets de texto.",
+  "version": "1.0.0",
+  "description": "Text expander: type a shortcut like /hi and Blasito replaces it with your saved text. Local-only, no accounts, no tracking.",
+  "homepage_url": "https://github.com/gabialonso/blasito",
+  "minimum_chrome_version": "92",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
   "permissions": ["storage"],
   "action": {
-    "default_popup": "src/popup/index.html"
+    "default_title": "Blasito",
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
   },
   "options_page": "src/options/index.html",
   "content_scripts": [
