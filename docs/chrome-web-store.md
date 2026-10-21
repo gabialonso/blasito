@@ -1,8 +1,10 @@
-# Publishing to the Chrome Web Store
+# Publishing Blasito to the Chrome Web Store
 
-Everything needed to submit Blasito, ready to paste into the
+This file is the maintainer checklist for submitting a new version to the
 [Chrome Web Store developer dashboard](https://chrome.google.com/webstore/devconsole).
-Store rules change; check each field against the dashboard when submitting.
+It holds the texts to paste into the dashboard and the answers for the privacy tab.
+It is not user documentation (see [README.md](../README.md)). Store rules change;
+check each field against the dashboard when you submit.
 
 ## 1. Build the package
 
@@ -19,17 +21,17 @@ The store rejects an upload whose version is not higher than the published one.
 
 **Name:** Blasito
 
-**Summary** (max 132 characters). It comes from `public/_locales/<language>/messages.json`, so the
-store shows it in the user's language:
+**Summary** (max 132 characters). The store reads it from the `extensionDescription` key in
+`public/_locales/<language>/messages.json`, so each language gets its own:
 
 > Text expander: type a shortcut like /hi and Blasito replaces it with your saved text. Local-only, no accounts, no tracking.
 
 > Expansor de texto: escribí un atajo como /hola y Blasito lo reemplaza por tu texto guardado. Local, sin cuentas ni rastreo.
 
-**Category:** Productivity → Tools (pick the closest one the dashboard offers).
+**Category:** Productivity → Tools.
 
-**Languages:** English (default) and Spanish. The interface has an ES/EN switch. Fill in the
-English listing first, then add Spanish as a localized listing with the texts and images below.
+**Languages:** English (default) and Spanish. Fill in the English listing first, then add
+Spanish as a localized listing.
 
 **Description (English):**
 
@@ -84,7 +86,7 @@ Disponible en español e inglés.
 Código fuente (MIT): https://github.com/gabialonso/blasito
 ```
 
-**Images** (in `store/`). The icon is the same for every language; the rest are in `en/` and `es/`:
+**Images** are in `store/`. The icon is shared; the rest are in `en/` and `es/`:
 
 | File | Use |
 | --- | --- |
@@ -98,7 +100,6 @@ Código fuente (MIT): https://github.com/gabialonso/blasito
 
 - Homepage / support: https://github.com/gabialonso/blasito
 - Privacy policy: https://github.com/gabialonso/blasito/blob/main/PRIVACY.md
-  (this URL works once `PRIVACY.md` is on `main`).
 
 ## 3. Privacy practices tab
 
@@ -115,10 +116,8 @@ Código fuente (MIT): https://github.com/gabialonso/blasito
 
 **Remote code:** No. All code is bundled in the package.
 
-**Data usage:** Blasito does not transmit any data off the device, has no server and no
-analytics. Shortcut detection reads the text before the cursor locally and keeps nothing.
-When the dashboard asks which user data types are collected, answer according to Google's
-current definitions; with the current code, no data leaves the device. Then certify:
+**Data usage:** answer according to Google's current definitions. Blasito has no server and no
+analytics, and nothing leaves the device, so no user data is collected. Then certify:
 
 - Data is not sold to third parties.
 - Data is not used or transferred for purposes unrelated to the single purpose.
@@ -126,8 +125,8 @@ current definitions; with the current code, no data leaves the device. Then cert
 
 ## 4. Before submitting
 
-- [ ] Developer account registered in the dashboard (Google charges a one-time registration fee; check the current amount there).
-- [ ] `PRIVACY.md` merged into `main`, so the privacy policy URL works.
+- [ ] Developer account registered in the dashboard (one-time fee; check the current amount there).
+- [ ] `PRIVACY.md` is on `main`, so the privacy policy URL works.
 - [ ] Version bumped in `public/manifest.json` and `package.json`.
 - [ ] `npm run typecheck && npm test && npm run package` pass.
 - [ ] `dist/` loaded unpacked in Chrome and tried by hand: create a snippet, expand it in a
@@ -135,4 +134,4 @@ current definitions; with the current code, no data leaves the device. Then cert
       and switch between ES and EN.
 - [ ] Upload `blasito.zip`, fill in the listing and privacy tabs, and submit for review.
 
-Broad host access usually means a longer review. The justification above explains why it is needed.
+Broad host access (`<all_urls>`) usually means a longer review; the justification above covers it.
