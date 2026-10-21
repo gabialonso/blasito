@@ -1,141 +1,115 @@
 # Blasito
 
-Blasito guarda textos que usás seguido y los inserta cuando escribís un atajo. Por ejemplo, podés guardar una respuesta con el atajo `/hola` y usarla en cualquier campo de texto sin volver a escribirla completa.
+**A local-first text expander for Chromium.** Type a shortcut like `/hola` in any text field and Blasito replaces it with the text you saved. No accounts, no servers, no tracking.
 
-Todo se guarda en el navegador con `chrome.storage.local`. No hay cuentas, servidor ni telemetría.
+![Type a shortcut, get the text](store/screenshot-1-expand.png)
 
-## Probarlo en Chrome
+> The interface is in Spanish. Contributions to translate it are welcome.
 
-Necesitás Node.js y npm. Desde la carpeta del proyecto ejecutá:
+## Features
+
+- **Expands as you type** in `input`, `textarea` and rich editors (`contenteditable`). It never touches password or other non-text fields.
+- **Popup search:** find a snippet from the toolbar and copy it with a click, or type and press Enter to copy the first result.
+- **Manage snippets** in a list with an editor next to it: create, edit, search, select several and delete.
+- **Import and export** your snippets as JSON.
+- **Safe by default:** asks before deleting or discarding unsaved changes, and warns when a shortcut is a plain word (like `ok`) that would also expand inside normal sentences.
+- **Keyboard friendly:** skip link to the editor, ↑/↓ through the list, Esc to leave the editor, and a resizable editor.
+- **Accessible:** text contrast of at least 7:1, visible focus, screen-reader labels, and no motion when the system asks for reduced motion.
+
+## Install
+
+**Chrome Web Store:** coming soon.
+
+**From source** (Node.js 22.12 or newer):
 
 ```bash
+git clone https://github.com/gabialonso/blasito.git
+cd blasito
 npm install
 npm run build
 ```
 
-Después:
+Then open `chrome://extensions`, turn on **Developer mode**, choose **Load unpacked** and select the `dist/` folder.
 
-1. Abrí `chrome://extensions`.
-2. Activá **Modo de desarrollador**.
-3. Elegí **Cargar extensión sin empaquetar**.
-4. Seleccioná la carpeta `dist/`.
+## Usage
 
-Si modificás el código, volvé a ejecutar `npm run build` y recargá Blasito desde `chrome://extensions`.
+1. Click the Blasito icon and choose **Administrar atajos**.
+2. Press **Nuevo atajo**, write a shortcut (for example `/hola`) and the text it should become, then **Guardar atajo**.
+3. Type `/hola` in any text field. As soon as you finish the shortcut, Blasito replaces it and leaves the cursor at the end.
 
-## Crear el archivo para subir
+Start shortcuts with a symbol such as `/` or `;`, so they never match normal words.
 
-```bash
-npm run package
-```
+### Keyboard (options page)
 
-Esto genera `blasito.zip` en la carpeta del proyecto. El archivo contiene la extensión compilada y las licencias de las fuentes, y se puede subir directamente a Chrome Web Store.
+| Key | Action |
+| --- | --- |
+| Tab (first) | Shows «Ir al editor» |
+| ↑ / ↓ from the search | Move through the snippets; Enter opens one |
+| Esc in the editor | Stop editing (asks first if there are unsaved changes) |
+| ← / → on the divider | Make the editor wider or narrower |
 
-## Cómo se usa
+### Import format
 
-1. Abrí Blasito y elegí **Administrar atajos**.
-2. Tocá **Nuevo atajo** y guardá un atajo, por ejemplo `/hola`, junto con el texto que querés insertar. Para cambiar o eliminar uno, elegilo en la lista y se abre en el editor.
-3. Escribí `/hola` en un campo de texto o editor web.
-4. Al terminar de escribir el atajo, Blasito lo reemplaza automáticamente.
-
-Blasito deja el cursor al final del texto insertado. Funciona en `textarea`, en campos `input` de tipo texto, búsqueda, email, URL y teléfono, y en editores `contenteditable`. Nunca actúa en campos de contraseña.
-
-Conviene que el atajo empiece con un símbolo, como `/hola` o `;firma`. Un atajo que es una palabra común, como `ok`, también se reemplaza cuando escribís esa palabra en una frase; Blasito te avisa antes de guardarlo.
-
-Desde el popup podés buscar un atajo y elegirlo para copiar su texto, o escribir parte del nombre y apretar Enter para copiar el primer resultado. Las flechas ↑ y ↓ recorren los resultados.
-
-### Atajos de teclado en «Administrar atajos»
-
-- **Tab** al entrar: aparece «Ir al editor».
-- **↑ / ↓** desde la búsqueda: recorren los atajos de la lista; **Enter** abre el elegido.
-- **Esc** en el editor: deja de editar. Si hay cambios sin guardar, primero pregunta.
-- El divisor entre la lista y el editor se arrastra para cambiar el ancho, o se mueve con **← / →** cuando tiene foco. El ancho elegido se recuerda.
-
-## Importar y exportar
-
-En **Administrar atajos**, **Exportar** (arriba a la derecha) descarga todos tus atajos e **Importar** agrega los de un archivo JSON. Podés armarlo a mano como una lista:
+A JSON array, or the same array inside a `snippets` property. `shortcut` and `content` are required; `name` is optional. Files made with **Exportar** can be imported back. Duplicates and invalid entries are skipped and reported; if the file is not valid, nothing changes.
 
 ```json
 [
-  {
-    "name": "Saludo",
-    "shortcut": "/hola",
-    "content": "Hola, ¿cómo estás?"
-  },
-  {
-    "shortcut": "/firma",
-    "content": "Saludos."
-  }
+  { "name": "Saludo", "shortcut": "/hola", "content": "Hola, ¿cómo estás?" },
+  { "shortcut": ";firma", "content": "Saludos." }
 ]
 ```
 
-También se acepta el mismo arreglo dentro de una propiedad `snippets`, y el archivo que genera **Exportar**. El nombre es opcional; `shortcut` y `content` son obligatorios y no pueden estar vacíos. Si un archivo no es válido, Blasito no cambia lo que ya tenías. Los atajos repetidos se saltean y la pantalla te informa el resultado.
+## Privacy
 
-## Qué incluye
+Everything stays on your device in `chrome.storage.local`. Blasito makes no network requests and only asks for the `storage` permission. See [PRIVACY.md](PRIVACY.md) for the details.
 
-- Crear, editar, buscar y eliminar atajos, de a uno o seleccionando varios.
-- Buscar y copiar los textos guardados desde el popup.
-- Evitar atajos vacíos o repetidos.
-- Importar y exportar atajos en JSON.
-- Expandir atajos en campos de texto y editores `contenteditable`.
-- Reproducir un tono breve al insertar un atajo.
-- Conservar los datos al cerrar el navegador.
-
-Todavía no incluye integración especial con editores como Monaco o CodeMirror.
-
-## Privacidad
-
-El script de contenido se ejecuta en todas las páginas porque tiene que detectar los atajos mientras escribís. Solo lee el campo activo cuando el último carácter escrito puede completar un atajo, no envía nada a ningún servidor y el único permiso que pide es `storage`.
-
-## Desarrollo
+## Development
 
 ```bash
-npm install
-npm run typecheck   # revisa los tipos
-npm test            # pruebas de la lógica
-npm run build       # genera dist/
+npm run typecheck   # TypeScript checks
+npm test            # unit tests (Vitest)
+npm run build       # build into dist/
+npm run package     # build and create blasito.zip for the Chrome Web Store
 ```
 
-El proyecto usa TypeScript y Vite, sin frameworks de interfaz: cada pantalla es un HTML con un script que arma la lista con funciones del DOM.
+The stack is TypeScript and Vite, with no UI framework: each screen is an HTML page plus a script that builds the list with DOM functions.
 
 ```text
-public/manifest.json   permisos y puntos de entrada de la extensión
-src/snippets/          lógica sin Chrome ni DOM: validar, buscar, importar, expandir
-  types.ts             forma de un atajo
-  model.ts             validación, búsqueda e importación
-  expansion.ts         encuentra un atajo justo antes del cursor
-  storage.ts           guarda y lee en chrome.storage.local
-src/content/           script que corre en cada página
-  index.ts             escucha lo que se escribe y decide si hay que expandir
-  target.ts            qué campos se aceptan y filtro rápido por tecla
-  expand.ts            reemplaza el texto en input/textarea y en contenteditable
-  sound.ts             tono breve al insertar
-src/options/           pantalla «Administrar atajos»
-  index.ts             lista, editor, importar/exportar y diálogos
-  resize.ts            divisor arrastrable entre lista y editor
-src/popup/             búsqueda y copia rápida
-src/shared/            lo que comparten popup y configuración
-  ui.ts                funciones de DOM: buscar elementos, armar la vista previa, flechas
-  styles.css           estilos; colores, espacios y tiempos están en variables al principio
-  fonts/               Asap y Hack con sus licencias
-tests/                 pruebas con Vitest, con las mismas carpetas que src/
+public/                manifest.json and icons
+src/
+  snippets/            logic with no Chrome or DOM: validate, search, import, expand
+  content/             content script that runs in web pages
+  options/             «Administrar atajos» page and its resizable divider
+  popup/               search and quick copy
+  shared/              DOM helpers, styles and fonts used by popup and options
+tests/                 same folders as src/
+store/                 Chrome Web Store images
+docs/                  publishing notes
 ```
 
-### Cómo fluye un atajo
+### How a shortcut flows
 
-1. En **Administrar atajos**, `options/index.ts` llama a `storage.ts`, que valida con `model.ts` y guarda la lista en `chrome.storage.local`.
-2. `content/index.ts` carga la lista al abrir la página y se entera de cada cambio con `watchSnippets`.
-3. Con cada tecla, `mightCompleteShortcut` descarta rápido lo que no puede terminar un atajo. Si puede, `expand.ts` busca el atajo antes del cursor con `findExpansion` y lo reemplaza.
+1. On the options page, `options/index.ts` calls `snippets/storage.ts`, which validates with `snippets/model.ts` and saves the list to `chrome.storage.local`.
+2. `content/index.ts` loads the list when a page opens and gets every change through `watchSnippets`.
+3. On each keystroke it drops unsupported fields, then `mightCompleteShortcut` skips any character that cannot end a shortcut. Only then does `content/expand.ts` look for the shortcut before the cursor and replace it.
 
-Lo que está en `src/snippets/` no depende de Chrome, así que se prueba directamente. Para cambiar la lógica, empezá por ahí y su prueba en `tests/snippets/`.
+Anything in `src/snippets/` runs without Chrome, so start there (and in `tests/snippets/`) when changing behavior.
 
-### Estilo visual
+### Style
 
-La interfaz es brutalista y por ahora solo tiene tema claro. Las variables de `:root` en `src/shared/styles.css` concentran colores, tipografías, bordes, sombras y espacios; el amarillo (`--mark`) marca hover y foco. Las animaciones son breves y solo confirman acciones (presionar, copiar, guardar, abrir un atajo); sus duraciones están en `--speed-fast` y `--speed`, y se desactivan si el sistema pide reducir el movimiento.
+The design is brutalist and light-only for now. Colors, fonts, borders, shadows, spacing and animation speeds are variables at the top of `src/shared/styles.css`. Rows are inverted by swapping the `--bg` and `--ink` roles.
 
-## Tipografía
+## Contributing
 
-La interfaz usa [Asap](https://github.com/Omnibus-Type/Asap), en su versión variable: un solo archivo con todos los pesos y el alfabeto latino, que incluye los caracteres del español.
+Issues and pull requests are welcome. Before opening a pull request, run `npm run typecheck && npm test && npm run build`, and add a test when you change something in `src/snippets/` or `src/content/`. Keep it simple: prefer what the browser already does over new code or dependencies.
 
-Los atajos y el campo para escribirlos usan [Hack](https://github.com/source-foundry/Hack), una fuente monoespaciada que distingue con claridad `0/O`, `1/l/I` y los símbolos. Se incluyen los subconjuntos web de Regular y Bold, que cubren los caracteres del español.
+## Credits
 
-Asap tiene licencia SIL Open Font License 1.1 y Hack, licencias MIT y Bitstream Vera. Las fuentes se sirven desde la extensión, sin pedidos externos, y sus archivos y licencias están en `src/shared/fonts/`.
+- [Asap](https://github.com/Omnibus-Type/Asap) by Omnibus-Type, SIL Open Font License 1.1.
+- [Hack](https://github.com/source-foundry/Hack) by Source Foundry, MIT License and Bitstream Vera License.
+
+The fonts and their licenses are in `src/shared/fonts/` and are included in the packaged extension.
+
+## License
+
+[MIT](LICENSE) © 2026 Gabriel Alonso
