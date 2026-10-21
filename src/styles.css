@@ -67,6 +67,21 @@ button { cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 [hidden] { display: none !important; }
 
+/* Hidden until it gets keyboard focus; then it appears at the top-left corner. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border);
+  color: var(--ink);
+  background: var(--bg);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
 /* ---------- Header ---------- */
 
 .topbar { background: var(--mark); border-bottom: var(--border); }
@@ -98,7 +113,8 @@ input, textarea {
 }
 input::placeholder, textarea::placeholder { color: var(--ink-soft); opacity: 1; }
 input:focus-visible, textarea:focus-visible { outline: 0; box-shadow: var(--shadow); }
-textarea { min-height: 8rem; resize: vertical; }
+/* It can grow, but not past half the window, so the buttons below stay reachable. */
+textarea { min-height: 8rem; max-height: 50vh; resize: vertical; }
 .mono-input { font-family: var(--font-mono); font-size: var(--text-small); font-weight: 700; }
 
 /* Checkboxes are drawn by hand so they share the thick border of the rest of the UI. */
@@ -186,6 +202,26 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 .empty-state strong { font-size: 1.25rem; font-weight: 800; }
 .empty-state span { color: var(--ink-soft); }
 
+/* Field errors sit right under their field, pulled up into the form gap. */
+.field-error { margin-top: calc(var(--space-3) - var(--space-5)); padding-left: var(--space-2); border-left: 6px solid var(--danger); color: var(--danger); font-weight: 700; }
+.field-error.is-announced { animation: slide-in var(--speed) var(--ease-out); }
+[aria-invalid="true"] { border-color: var(--danger); box-shadow: 4px 4px 0 var(--danger); }
+
+/* ---------- Confirmation dialog ---------- */
+
+.dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: var(--space-5);
+  border: var(--border);
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.dialog[open] { animation: drop-in var(--speed) var(--ease-out); }
+.dialog form { gap: var(--space-4); }
+.dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-3); }
+
 /* ---------- Snippet summary (popup and options list) ---------- */
 
 /* Shortcuts look like keyboard keys: this is what you type. */
@@ -202,7 +238,7 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   overflow-wrap: anywhere;
 }
 .snippet-heading { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); min-width: 0; }
-.snippet-name { font-size: 1.0625rem; font-weight: 700; }
+.snippet-name { min-width: 0; font-size: 1.0625rem; font-weight: 700; overflow-wrap: anywhere; }
 .snippet-preview {
   display: -webkit-box;
   overflow: hidden;
@@ -217,17 +253,44 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 
 /* ---------- Options page ---------- */
 
-/* Full width: the editor keeps a fixed width on the right and the list takes all the rest. */
+/* Full width: the list takes all the space the editor leaves. The editor width is set by
+   dragging the divider between them (see options/resize.ts). */
 .options-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem);
+  grid-template-columns: minmax(0, 1fr) auto var(--editor-width, 26rem);
   align-items: start;
-  gap: var(--space-6);
+  gap: var(--space-3);
   padding: var(--space-6) var(--space-5);
 }
 .panel { border: var(--border); background: var(--bg); box-shadow: var(--shadow); }
+
+/* The divider is a small grip that stays in view while the page scrolls. */
+.panel-resizer {
+  position: sticky;
+  top: 40vh;
+  width: 1rem;
+  height: 4rem;
+  border: var(--border);
+  background: linear-gradient(var(--ink), var(--ink)) center / 3px 50% no-repeat, var(--bg);
+  box-shadow: var(--shadow-small);
+  cursor: col-resize;
+  touch-action: none;
+}
+.panel-resizer:hover,
+.panel-resizer:focus-visible,
+.panel-resizer.is-dragging { background-color: var(--mark); }
 .list-panel { display: grid; gap: var(--space-4); padding: var(--space-5); }
-.editor-panel { position: sticky; top: var(--space-5); display: grid; gap: var(--space-5); padding: var(--space-5); }
+/* The editor follows the scroll, and never gets taller than the window: if its content
+   doesn't fit, the editor scrolls on its own so "Guardar" is always reachable. */
+.editor-panel {
+  position: sticky;
+  top: var(--space-5);
+  display: grid;
+  gap: var(--space-5);
+  max-height: calc(100vh - 2 * var(--space-5));
+  overflow-y: auto;
+  padding: var(--space-5);
+}
 .panel-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
 .count { margin-left: var(--space-1); padding: 0 var(--space-2); border: 2px solid var(--ink); font-size: 1rem; font-weight: 700; vertical-align: middle; }
 .list-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 2.5rem; }
@@ -247,9 +310,10 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
 
 @media (max-width: 1024px) {
   /* Extra right padding leaves room for the hard shadow. */
+  .panel-resizer { display: none; }
   .options-layout { grid-template-columns: 1fr; gap: var(--space-5); padding: var(--space-4) var(--space-5) var(--space-4) var(--space-3); }
   .panel { box-shadow: 4px 4px 0 var(--ink); }
-  .editor-panel { position: static; }
+  .editor-panel { position: static; max-height: none; overflow-y: visible; }
   .list-panel, .editor-panel { padding: var(--space-4); }
   .topbar-inner { padding: var(--space-3) var(--space-4); }
   .wordmark { font-size: 1.875rem; }
@@ -335,6 +399,11 @@ input[type="checkbox"]:indeterminate::before { height: .25rem; clip-path: none; 
   from { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 var(--mark); }
 }
 .popup-item.is-inverted { animation: stamp var(--speed) var(--ease-out); }
+
+/* The confirmation dialog drops in from above. */
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-16px); }
+}
 
 /* The editor nudges when a snippet opens in it, to show its content changed. */
 @keyframes nudge {

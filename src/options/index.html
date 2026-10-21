@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../styles.css" />
   </head>
   <body class="options-page">
+    <a id="skip-to-editor" class="skip-link" href="#editor">Ir al editor</a>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="topbar-copy">
@@ -31,8 +32,9 @@
         </div>
         <label class="search-field">
           <span class="sr-only">Buscar atajos</span>
-          <input id="search" type="search" placeholder="Buscar atajos" />
+          <input id="search" type="search" placeholder="Buscar atajos" aria-describedby="list-keys-hint" />
         </label>
+        <p id="list-keys-hint" class="sr-only">Con las flechas arriba y abajo te movés entre los atajos.</p>
         <p id="list-status" class="status" role="status" aria-live="polite"></p>
         <div id="list-toolbar" class="list-toolbar">
           <label class="select-all-field">
@@ -48,11 +50,25 @@
         </div>
       </section>
 
+      <div
+        id="panel-resizer"
+        class="panel-resizer"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Ancho del editor"
+        aria-controls="editor"
+        tabindex="0"
+        title="Arrastrá para cambiar el ancho del editor"
+      ></div>
+
       <section id="editor" class="panel editor-panel" aria-labelledby="editor-title">
         <h2 id="editor-title">Nuevo atajo</h2>
-        <form id="snippet-form">
-          <label>Atajo <span class="hint">Lo que vas a escribir, por ejemplo /hola</span><input id="shortcut" class="mono-input" name="shortcut" autocomplete="off" spellcheck="false" required /></label>
-          <label>Texto guardado <span class="hint">Lo que aparece en lugar del atajo</span><textarea id="content" name="content" rows="5" required></textarea></label>
+        <!-- novalidate: errors are shown by the page, not by the browser's bubbles. -->
+        <form id="snippet-form" novalidate>
+          <label>Atajo <span class="hint">Lo que vas a escribir, por ejemplo /hola</span><input id="shortcut" class="mono-input" name="shortcut" autocomplete="off" spellcheck="false" required aria-describedby="shortcut-error" /></label>
+          <p id="shortcut-error" class="field-error" hidden></p>
+          <label>Texto guardado <span class="hint">Lo que aparece en lugar del atajo</span><textarea id="content" name="content" rows="5" required aria-describedby="content-error"></textarea></label>
+          <p id="content-error" class="field-error" hidden></p>
           <label>Nombre <span class="hint">Opcional, para encontrarlo después</span><input id="name" name="name" autocomplete="off" /></label>
           <p id="form-status" class="status" role="status" aria-live="polite"></p>
           <div class="form-actions">
@@ -63,6 +79,18 @@
         </form>
       </section>
     </main>
+
+    <!-- Confirmation dialog: replaces window.confirm. Esc or "Cancelar" closes it without acting. -->
+    <dialog id="confirm-dialog" class="dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <form method="dialog">
+        <h2 id="confirm-title">¿Eliminar?</h2>
+        <p id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button class="button" value="cancel" autofocus>Cancelar</button>
+          <button id="confirm-button" class="button danger" value="confirm">Eliminar</button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="./index.ts"></script>
   </body>
 </html>

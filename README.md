@@ -39,7 +39,16 @@ Esto genera `blasito.zip` en la carpeta del proyecto. El archivo contiene la ext
 
 Blasito deja el cursor al final del texto insertado. Funciona en `textarea`, en campos `input` de tipo texto, búsqueda, email, URL y teléfono, y en editores `contenteditable`. Nunca actúa en campos de contraseña.
 
-Desde el popup podés buscar un atajo y elegirlo para copiar su texto. Las flechas ↑ y ↓ recorren los resultados.
+Conviene que el atajo empiece con un símbolo, como `/hola` o `;firma`. Un atajo que es una palabra común, como `ok`, también se reemplaza cuando escribís esa palabra en una frase; Blasito te avisa antes de guardarlo.
+
+Desde el popup podés buscar un atajo y elegirlo para copiar su texto, o escribir parte del nombre y apretar Enter para copiar el primer resultado. Las flechas ↑ y ↓ recorren los resultados.
+
+### Atajos de teclado en «Administrar atajos»
+
+- **Tab** al entrar: aparece «Ir al editor».
+- **↑ / ↓** desde la búsqueda: recorren los atajos de la lista; **Enter** abre el elegido.
+- **Esc** en el editor: deja de editar. Si hay cambios sin guardar, primero pregunta.
+- El divisor entre la lista y el editor se arrastra para cambiar el ancho, o se mueve con **← / →** cuando tiene foco. El ancho elegido se recuerda.
 
 ## Importar y exportar
 
@@ -101,6 +110,8 @@ src/content/           script que corre en cada página
   expand.ts            reemplaza el texto en input/textarea y en contenteditable
   sound.ts             tono breve al insertar
 src/options/           pantalla «Administrar atajos»
+  index.ts             lista, editor, importar/exportar y diálogos
+  resize.ts            divisor arrastrable entre lista y editor
 src/popup/             búsqueda y copia rápida
 src/ui.ts              funciones de DOM compartidas por popup y configuración
 src/styles.css         estilos; los colores y espacios están en variables al principio

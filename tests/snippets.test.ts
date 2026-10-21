@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import {
   createSnippet,
   filterSnippets,
+  looksLikeAWord,
   previewLines,
   parseStoredSnippets,
   updateSnippet,
   validateDraft,
+  ValidationError,
 } from "../src/snippets/model";
-import type { Snippet } from "../src/snippets/types";
+import type { Snippet, SnippetDraft } from "../src/snippets/types";
 
 const existing: Snippet = {
   id: "one",
@@ -40,11 +42,26 @@ describe("validateDraft", () => {
       "Escribí el atajo que querés usar.",
     );
     expect(() => validateDraft({ name: "Saludo", shortcut: "/hola", content: "  " }, [])).toThrow(
-      "Escribí el contenido que querés guardar.",
+      "Escribí el texto que querés guardar.",
     );
     expect(() =>
       validateDraft({ name: "Saludo", shortcut: " /hello ", content: "x" }, [existing]),
-    ).toThrow("Ya guardaste un atajo igual.");
+    ).toThrow("Ya tenés un atajo igual. Elegí otro.");
+  });
+
+  it("indica qué campo hay que corregir", () => {
+    const fieldOf = (draft: SnippetDraft) => {
+      try {
+        validateDraft(draft, [existing]);
+      } catch (error) {
+        return error instanceof ValidationError ? error.field : "otro error";
+      }
+      return "sin error";
+    };
+
+    expect(fieldOf({ shortcut: " ", content: "x" })).toBe("shortcut");
+    expect(fieldOf({ shortcut: "/nuevo", content: " " })).toBe("content");
+    expect(fieldOf({ shortcut: "/hello", content: "x" })).toBe("shortcut");
   });
 
   it("permite conservar el shortcut del snippet editado", () => {
@@ -144,5 +161,19 @@ describe("previewLines", () => {
 
   it("mantiene un texto de una sola línea", () => {
     expect(previewLines("Listo, gracias.")).toEqual(["Listo, gracias."]);
+  });
+});
+
+describe("looksLikeAWord", () => {
+  it("detecta atajos que también son palabras comunes", () => {
+    expect(looksLikeAWord("ok")).toBe(true);
+    expect(looksLikeAWord("año")).toBe(true);
+    expect(looksLikeAWord("hola2")).toBe(true);
+  });
+
+  it("acepta atajos con algún símbolo", () => {
+    expect(looksLikeAWord("/ok")).toBe(false);
+    expect(looksLikeAWord(";firma")).toBe(false);
+    expect(looksLikeAWord("ok!")).toBe(false);
   });
 });

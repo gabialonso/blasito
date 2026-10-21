@@ -22,6 +22,22 @@ export function setEmptyState(emptyState: HTMLElement, title: string, detail: st
   if (detailElement) detailElement.textContent = detail;
 }
 
+/**
+ * ↑ and ↓ move focus through `items`. ↑ on the first item (or from `start` itself)
+ * goes back to `start`, usually the search field above the list.
+ */
+export function handleArrowKeys(event: KeyboardEvent, items: HTMLElement[], start: HTMLElement): void {
+  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+  if (items.length === 0) return;
+  event.preventDefault();
+
+  // `start` counts as position -1, above the first item.
+  const current = items.indexOf(event.target as HTMLElement);
+  const next = event.key === "ArrowDown" ? Math.min(current + 1, items.length - 1) : current - 1;
+  if (next < 0) start.focus();
+  else items[next].focus();
+}
+
 /** Restarts a CSS animation, even if the element already has the class. */
 export function replayAnimation(element: HTMLElement, className: string): void {
   element.classList.remove(className);
