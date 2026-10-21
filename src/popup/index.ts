@@ -1,4 +1,3 @@
-// Popup: search saved snippets and copy one to the clipboard.
 import { filterSnippets } from "../snippets/model";
 import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
@@ -27,7 +26,6 @@ const copiedTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 optionsButton.addEventListener("click", () => void chrome.runtime.openOptionsPage());
 searchInput.addEventListener("input", renderSnippets);
 searchInput.addEventListener("keydown", moveWithArrows);
-// Enter in the search copies the first result: type a few letters, press Enter, done.
 searchInput.addEventListener("keydown", (event) => {
   if (event.key !== "Enter") return;
   event.preventDefault();
@@ -93,7 +91,7 @@ async function copySnippet(snippet: Snippet, button: HTMLElement, copyLabel: HTM
   copyLabel.textContent = t().copied;
   showStatus(t().copiedStatus(snippet.shortcut));
 
-  // Copying again restarts the countdown instead of letting the old one cut it short.
+  // copying again restarts the countdown instead of letting the old one cut it short.
   clearTimeout(copiedTimers.get(button));
   const timer = setTimeout(() => {
     button.classList.remove("is-inverted");
@@ -109,7 +107,7 @@ function moveWithArrows(event: KeyboardEvent): void {
 function showStatus(message: string, isError = false): void {
   status.textContent = message;
   status.dataset.kind = isError ? "error" : "success";
-  // Success is already visible on the copied item, so screen readers are the only audience.
+  // success is already visible on the copied item, so screen readers are the only audience.
   status.classList.toggle("sr-only", !isError);
   replayAnimation(status, "is-announced");
 }

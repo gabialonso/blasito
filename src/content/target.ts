@@ -4,7 +4,7 @@ export function supportsInputType(type: string): boolean {
   return SUPPORTED_INPUT_TYPES.has(type);
 }
 
-// Cheap filter that runs on every keystroke: only insertions whose last character
+// cheap filter that runs on every keystroke: only insertions whose last character
 // can finish some shortcut are worth reading the field for.
 export function mightCompleteShortcut(
   inputType: string | undefined,

@@ -2,7 +2,7 @@ import { t } from "../shared/i18n";
 import { createSnippet, parseStoredSnippets, prepareImport, updateSnippet } from "./model";
 import type { ImportResult, Snippet, SnippetDraft } from "./types";
 
-// All snippets live as one array under this key in chrome.storage.local.
+// all snippets live as one array under this key in chrome.storage.local.
 const STORAGE_KEY = "snippets";
 
 export async function getSnippets(): Promise<Snippet[]> {
@@ -43,7 +43,7 @@ export async function importSnippets(value: unknown): Promise<ImportResult> {
   return result;
 }
 
-/** Calls `onChange` with the new list every time snippets change, from any tab or page. */
+/** calls `onChange` with the new list every time snippets change, from any tab or page. */
 export function watchSnippets(onChange: (snippets: Snippet[]) => void, onError: (error: unknown) => void): void {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "local" || !changes[STORAGE_KEY]) return;
