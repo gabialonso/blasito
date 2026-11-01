@@ -57,7 +57,7 @@ PRIVATE BY DESIGN
 
 Available in English and Spanish. The English translation is new and may contain mistakes;
 corrections are welcome on GitHub.
-Source code (MIT): https://github.com/gabialonso/blasito
+Source code (MIT): https://github.com/usuallygabo/blasito
 ```
 
 **Description (Spanish):**
@@ -83,7 +83,7 @@ PRIVADO POR DISEÑO
 • Solo el permiso "storage".
 
 Disponible en español e inglés.
-Código fuente (MIT): https://github.com/gabialonso/blasito
+Código fuente (MIT): https://github.com/usuallygabo/blasito
 ```
 
 **Images** are in `store/`. The icon is shared; the rest are in `en/` and `es/`:
@@ -98,8 +98,8 @@ Código fuente (MIT): https://github.com/gabialonso/blasito
 
 **Links:**
 
-- Homepage / support: https://github.com/gabialonso/blasito
-- Privacy policy: https://github.com/gabialonso/blasito/blob/main/PRIVACY.md
+- Homepage / support: https://github.com/usuallygabo/blasito
+- Privacy policy: https://github.com/usuallygabo/blasito/blob/main/PRIVACY.md
 
 ## 3. Privacy practices tab
 

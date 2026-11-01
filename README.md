@@ -40,7 +40,7 @@
 **From source** (Node.js 22.12 or newer):
 
 ```bash
-git clone https://github.com/gabialonso/blasito.git
+git clone https://github.com/usuallygabo/blasito.git
 cd blasito
 npm install
 npm run build

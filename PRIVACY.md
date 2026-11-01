@@ -35,4 +35,4 @@ Uninstalling Blasito deletes everything it stored. To keep your snippets, use **
 
 ## Contact
 
-Questions or concerns: open an issue at <https://github.com/gabialonso/blasito/issues>.
+Questions or concerns: open an issue at <https://github.com/usuallygabo/blasito/issues>.

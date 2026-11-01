@@ -4,7 +4,7 @@
   "version": "1.0.2",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-  "homepage_url": "https://github.com/gabialonso/blasito",
+  "homepage_url": "https://github.com/usuallygabo/blasito",
   "minimum_chrome_version": "92",
   "icons": {
     "16": "icons/icon-16.png",
