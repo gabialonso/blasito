@@ -1,7 +1,7 @@
 {
   "name": "blasito",
   "version": "1.0.2",
-  "description": "Local-first text expander for Chromium: type a shortcut, get your saved text.",
+  "description": "Local-first text expander for Chromium and Firefox: type a shortcut, get your saved text.",
   "license": "MIT",
   "repository": {
     "type": "git",

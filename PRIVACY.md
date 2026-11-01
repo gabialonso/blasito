@@ -6,7 +6,7 @@ Blasito is a text expander that runs entirely in your browser. It has no servers
 
 ## What Blasito stores
 
-- **Your snippets** (shortcut, text and optional name) and their creation dates, in `chrome.storage.local`, on your device. They are not synced and never leave the browser unless you export them. They are stored as plain text, without encryption, so anyone with access to your browser profile can read them. Don't save passwords or secrets as snippets.
+- **Your snippets** (shortcut, text and optional name) and their creation dates, in the browser's local extension storage (`storage.local`), on your device. They are not synced and never leave the browser unless you export them. They are stored as plain text, without encryption, so anyone with access to your browser profile can read them. Don't save passwords or secrets as snippets.
 - **Your preferences:** the interface language and the editor width, in the extension's own `localStorage`.
 
 ## What Blasito reads

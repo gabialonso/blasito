@@ -4,7 +4,7 @@
     <img src="src/shared/logo.svg" alt="" width="120" />
   </picture>
   <h1>Blasito</h1>
-  <p><strong>A local-first text expander for Chromium.</strong><br />
+  <p><strong>A local-first text expander for Chromium and Firefox.</strong><br />
   Type a shortcut like <code>/hi</code> in any text field and Blasito replaces it with the text you saved.<br />
   No accounts, no servers, no tracking.</p>
   <p>
@@ -35,7 +35,7 @@
 
 ## Install
 
-**Chrome Web Store:** coming soon.
+**Chrome Web Store** and **Firefox Add-ons:** coming soon.
 
 **From source** (Node.js 22.12 or newer):
 
@@ -46,7 +46,8 @@ npm install
 npm run build
 ```
 
-Then open `chrome://extensions`, turn on **Developer mode**, choose **Load unpacked** and select the `dist/` folder.
+- **Chrome and other Chromium browsers:** open `chrome://extensions`, turn on **Developer mode**, choose **Load unpacked** and select the `dist/` folder.
+- **Firefox (140 or newer):** open `about:debugging`, choose **This Firefox** → **Load Temporary Add-on** and select `dist-firefox/manifest.json`. Firefox removes temporary add-ons when it closes.
 
 ## Usage
 
@@ -78,21 +79,23 @@ A JSON array, or the same array inside a `snippets` property. `shortcut` and `co
 
 ## Privacy
 
-Everything stays on your device in `chrome.storage.local`. Blasito makes no network requests and only asks for the `storage` permission. See [PRIVACY.md](PRIVACY.md) for the details.
+Everything stays on your device, in the browser's local extension storage (`storage.local`). Blasito makes no network requests and only asks for the `storage` permission. See [PRIVACY.md](PRIVACY.md) for the details.
 
 ## Development
 
 ```bash
-npm run typecheck   # TypeScript checks
-npm test            # unit tests (Vitest)
-npm run build       # build into dist/
-npm run package     # build and create blasito.zip for the Chrome Web Store
+npm run typecheck     # TypeScript checks
+npm test              # unit tests (Vitest)
+npm run build         # build into dist/ (Chrome) and dist-firefox/ (Firefox)
+npm run package       # build and create the Chrome, Firefox and source zips
+npm run lint:firefox  # check dist-firefox/ with Mozilla's validator
 ```
 
 The stack is TypeScript and Vite, with no UI framework: each screen is an HTML page plus a script that builds the list with DOM functions.
 
 ```text
 public/                manifest.json, icons and the store summary in each language (_locales/)
+scripts/               build-firefox.mjs: copies dist/ to dist-firefox/ with a Firefox manifest
 src/
   snippets/            logic with no Chrome or DOM: validate, search, import, expand
   content/             content script that runs in web pages
@@ -100,8 +103,8 @@ src/
   popup/               search and quick copy
   shared/              texts in each language (i18n.ts), DOM helpers, styles, fonts and logo
 tests/                 same folders as src/
-store/                 Chrome Web Store images (icon, and en/ and es/ screenshots)
-docs/                  publishing notes
+store/                 store images (icon, and en/ and es/ screenshots)
+docs/                  publishing checklists for the Chrome Web Store and Firefox Add-ons
 ```
 
 ### How a shortcut flows
