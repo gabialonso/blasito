@@ -11,10 +11,10 @@ check each field against the dashboard when you submit.
 ```bash
 npm ci
 npm run typecheck && npm test
-npm run package     # creates blasito.zip (dist/ + font licenses)
+npm run package     # creates blasito-chrome.zip (plus the Firefox and source zips)
 ```
 
-Before each release, bump the version in **both** `public/manifest.json` and `package.json`.
+Before each release, bump the version in `public/manifest.json`, `package.json` and `package-lock.json`.
 The store rejects an upload whose version is not higher than the published one.
 
 ## 2. Store listing
@@ -51,13 +51,13 @@ FEATURES
 • Keyboard friendly and accessible: high contrast, visible focus, reduced-motion support.
 
 PRIVATE BY DESIGN
-• Your snippets stay on your device (chrome.storage.local).
+• Your snippets stay on your device, in the browser's local storage.
 • No accounts, no servers, no analytics, no network requests.
 • Only the "storage" permission.
 
 Available in English and Spanish. The English translation is new and may contain mistakes;
 corrections are welcome on GitHub.
-Source code (MIT): https://github.com/gabialonso/blasito
+Source code (MIT): https://github.com/usuallygabo/blasito
 ```
 
 **Description (Spanish):**
@@ -78,12 +78,12 @@ FUNCIONES
 • Cómodo con teclado y accesible: alto contraste, foco visible, respeta el movimiento reducido.
 
 PRIVADO POR DISEÑO
-• Tus atajos quedan en tu dispositivo (chrome.storage.local).
+• Tus atajos quedan en tu dispositivo, en el almacenamiento local del navegador.
 • Sin cuentas, sin servidores, sin analíticas, sin conexiones de red.
 • Solo el permiso "storage".
 
 Disponible en español e inglés.
-Código fuente (MIT): https://github.com/gabialonso/blasito
+Código fuente (MIT): https://github.com/usuallygabo/blasito
 ```
 
 **Images** are in `store/`. The icon is shared; the rest are in `en/` and `es/`:
@@ -98,8 +98,8 @@ Código fuente (MIT): https://github.com/gabialonso/blasito
 
 **Links:**
 
-- Homepage / support: https://github.com/gabialonso/blasito
-- Privacy policy: https://github.com/gabialonso/blasito/blob/main/PRIVACY.md
+- Homepage / support: https://github.com/usuallygabo/blasito
+- Privacy policy: https://github.com/usuallygabo/blasito/blob/main/PRIVACY.md
 
 ## 3. Privacy practices tab
 
@@ -127,11 +127,11 @@ analytics, and nothing leaves the device, so no user data is collected. Then cer
 
 - [ ] Developer account registered in the dashboard (one-time fee; check the current amount there).
 - [ ] `PRIVACY.md` is on `main`, so the privacy policy URL works.
-- [ ] Version bumped in `public/manifest.json` and `package.json`.
+- [ ] Version bumped in `public/manifest.json`, `package.json` and `package-lock.json`.
 - [ ] `npm run typecheck && npm test && npm run package` pass.
 - [ ] `dist/` loaded unpacked in Chrome and tried by hand: create a snippet, expand it in a
       textarea and in a rich editor, copy from the popup, import and export,
       and switch between ES and EN.
-- [ ] Upload `blasito.zip`, fill in the listing and privacy tabs, and submit for review.
+- [ ] Upload `blasito-chrome.zip`, fill in the listing and privacy tabs, and submit for review.
 
 Broad host access (`<all_urls>`) usually means a longer review; the justification above covers it.

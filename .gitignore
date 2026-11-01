@@ -1,5 +1,6 @@
 node_modules/
 dist/
-blasito.zip
+dist-firefox/
+blasito*.zip
 *.log
 .DS_Store

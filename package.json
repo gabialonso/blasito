@@ -1,11 +1,11 @@
 {
   "name": "blasito",
   "version": "1.0.2",
-  "description": "Local-first text expander for Chromium: type a shortcut, get your saved text.",
+  "description": "Local-first text expander for Chromium and Firefox: type a shortcut, get your saved text.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gabialonso/blasito.git"
+    "url": "https://github.com/usuallygabo/blasito.git"
   },
   "private": true,
   "type": "module",
@@ -13,8 +13,9 @@
     "node": ">=22.12"
   },
   "scripts": {
-    "build": "vite build && vite build --config vite.content.config.ts",
-    "package": "npm run build && cp src/shared/fonts/*.txt dist/ && rm -f blasito.zip && cd dist && zip -qr ../blasito.zip .",
+    "build": "vite build && vite build --config vite.content.config.ts && cp src/shared/fonts/*.txt dist/ && node scripts/build-firefox.mjs",
+    "package": "npm run build && rm -f blasito-*.zip && (cd dist && zip -qr ../blasito-chrome.zip .) && (cd dist-firefox && zip -qr ../blasito-firefox.zip .) && git archive --format=zip -o blasito-source.zip HEAD",
+    "lint:firefox": "npx --yes web-ext@10.8.0 lint --source-dir dist-firefox",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
