@@ -5,6 +5,8 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
+    // the polyfill calls fetch(); chrome 92+ preloads modules natively.
+    modulePreload: { polyfill: false },
     rollupOptions: {
       input: {
         popup: "src/popup/index.html",

@@ -26,6 +26,8 @@ function setSnippets(newSnippets: Snippet[]): void {
 
 function handleInput(event: Event): void {
   if (isReplacing || snippets.length === 0) return;
+  // a page can fake input events to make us expand a shortcut and then read its text.
+  if (!event.isTrusted) return;
   // unsupported fields (passwords, numbers, dates...) are dropped before looking at what was typed.
   if (!isTextControl(event.target) && !isContentEditable(event.target)) return;
 

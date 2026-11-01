@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Blasito",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "homepage_url": "https://github.com/gabialonso/blasito",
@@ -13,6 +13,9 @@
     "128": "icons/icon-128.png"
   },
   "permissions": ["storage"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'"
+  },
   "action": {
     "default_title": "Blasito",
     "default_popup": "src/popup/index.html",
