@@ -76,6 +76,10 @@ const es = {
   missingContent: "Escribí el texto que querés guardar.",
   duplicateShortcut: "Ya tenés un atajo igual. Elegí otro.",
   unreadableStorage: "No pudimos leer los atajos guardados.",
+  unreadableSnippets: (count: number) =>
+    count === 1
+      ? "No pudimos leer 1 atajo guardado. Lo dejamos como está y el resto funciona normal."
+      : `No pudimos leer ${count} atajos guardados. Los dejamos como están y el resto funciona normal.`,
   notAList: "El archivo debe contener una lista de atajos.",
   snippetNotFound: "No encontramos ese atajo. Puede que lo hayas eliminado en otra pestaña.",
 };
@@ -152,6 +156,10 @@ const en: Messages = {
   missingContent: "Type the text you want to save.",
   duplicateShortcut: "You already have this shortcut. Pick another one.",
   unreadableStorage: "Couldn't read the saved snippets.",
+  unreadableSnippets: (count) =>
+    count === 1
+      ? "Couldn't read 1 saved snippet. It was left as it is, and the rest work normally."
+      : `Couldn't read ${count} saved snippets. They were left as they are, and the rest work normally.`,
   notAList: "The file must contain a list of snippets.",
   snippetNotFound: "That snippet no longer exists. It may have been deleted in another tab.",
 };

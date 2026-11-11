@@ -1,6 +1,6 @@
 import { filterSnippets, looksLikeAWord, ValidationError } from "../snippets/model";
 import type { ImportResult, Snippet, SnippetDraft } from "../snippets/types";
-import { addSnippet, deleteSnippets, editSnippet, getSnippets, importSnippets } from "../snippets/storage";
+import { addSnippet, deleteSnippets, editSnippet, getStoredSnippets, importSnippets } from "../snippets/storage";
 import { setupEditorResizer } from "./resize";
 import { formatList, t } from "../shared/i18n";
 import {
@@ -102,12 +102,14 @@ setupLanguageSwitch(() => {
 void loadSnippets();
 
 async function loadSnippets(): Promise<void> {
+  let unreadable: unknown[];
   try {
-    snippets = await getSnippets();
+    ({ snippets, unreadable } = await getStoredSnippets());
   } catch (error: unknown) {
     showMessage(listStatus, errorMessage(error), true);
     return;
   }
+  if (unreadable.length) showMessage(listStatus, t().unreadableSnippets(unreadable.length), true);
 
   for (const id of selectedIds) {
     if (!snippets.some((snippet) => snippet.id === id)) selectedIds.delete(id);
