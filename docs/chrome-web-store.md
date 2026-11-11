@@ -53,7 +53,7 @@ FEATURES
 PRIVATE BY DESIGN
 • Your snippets stay on your device, in the browser's local storage.
 • No accounts, no servers, no analytics, no network requests.
-• Only the "storage" permission.
+• Only the "storage" permission, plus a content script on every site so shortcuts work anywhere.
 
 Available in English and Spanish. The English translation is new and may contain mistakes;
 corrections are welcome on GitHub.
@@ -116,8 +116,12 @@ Código fuente (MIT): https://github.com/usuallygabo/blasito
 
 **Remote code:** No. All code is bundled in the package.
 
-**Data usage:** answer according to Google's current definitions. Blasito has no server and no
-analytics, and nothing leaves the device, so no user data is collected. Then certify:
+**Data usage:** Google asks to disclose user data handling even when the data is only processed or
+stored on the device (User Data FAQ, question 3), so "nothing leaves the device" does not mean
+"no user data". Blasito reads the text before the cursor in the fields the user types in and stores
+the user's snippets locally: check **Website content** (and any other box that matches the
+dashboard's current definitions), and say in the justification that everything stays on the device
+and nothing is transmitted. Then certify:
 
 - Data is not sold to third parties.
 - Data is not used or transferred for purposes unrelated to the single purpose.
