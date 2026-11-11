@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { mightCompleteShortcut, supportsInputType } from "../../src/content/target";
+import { isSensitiveAutocomplete, mightCompleteShortcut, supportsInputType, wasPasswordType } from "../../src/content/target";
 
 describe("supportsInputType", () => {
   it.each(["text", "search", "email", "url", "tel"])(
@@ -14,6 +14,38 @@ describe("supportsInputType", () => {
     "ignora input type=%s",
     (type) => {
       expect(supportsInputType(type)).toBe(false);
+    },
+  );
+});
+
+describe("wasPasswordType", () => {
+  it("detecta un campo de contraseña que se acaba de mostrar", () => {
+    expect(wasPasswordType("password")).toBe(true);
+    expect(wasPasswordType(" PASSWORD ")).toBe(true);
+  });
+
+  it.each([null, "", "text", "email", "search"])("no marca campos que antes eran type=%s", (previousType) => {
+    expect(wasPasswordType(previousType)).toBe(false);
+  });
+});
+
+describe("isSensitiveAutocomplete", () => {
+  it.each(["current-password", "new-password", "one-time-code", "cc-number", "cc-csc", "cc-exp"])(
+    "ignora campos con autocomplete=%s aunque sean type=text",
+    (autocomplete) => {
+      expect(isSensitiveAutocomplete(autocomplete)).toBe(true);
+    },
+  );
+
+  it("reconoce el token sensible entre otros tokens y sin importar mayúsculas", () => {
+    expect(isSensitiveAutocomplete("section-login Current-Password")).toBe(true);
+    expect(isSensitiveAutocomplete("shipping  cc-number")).toBe(true);
+  });
+
+  it.each([null, "", "on", "off", "email", "username", "name", "cc-name"])(
+    "permite atajos con autocomplete=%s",
+    (autocomplete) => {
+      expect(isSensitiveAutocomplete(autocomplete)).toBe(false);
     },
   );
 });
