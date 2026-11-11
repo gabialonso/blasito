@@ -3,13 +3,15 @@ import type { Snippet } from "../snippets/types";
 import { getSnippets, watchSnippets } from "../snippets/storage";
 import { expandContentEditable, expandTextControl } from "./expand";
 import { playExpansionSound } from "./sound";
-import { isSensitiveAutocomplete, mightCompleteShortcut, supportsInputType } from "./target";
+import { isSensitiveAutocomplete, mightCompleteShortcut, supportsInputType, wasPasswordType } from "./target";
 
 let snippets: Snippet[] = [];
 // last character of every shortcut, used to skip most keystrokes cheaply.
 let lastCharacters = new Set<string>();
 // replacing text fires a new "input" event; this flag stops us from handling our own change.
 let isReplacing = false;
+// "show password" turns a password field into type=text; it stays a password field for us.
+const revealedPasswordFields = new WeakSet<Node>();
 
 getSnippets()
   .then(setSnippets)
@@ -18,6 +20,17 @@ getSnippets()
 watchSnippets(setSnippets, (error) => console.error("Blasito received invalid snippets.", error));
 
 document.addEventListener("input", handleInput);
+new MutationObserver(rememberRevealedPasswordFields).observe(document, {
+  subtree: true,
+  attributeFilter: ["type"],
+  attributeOldValue: true,
+});
+
+function rememberRevealedPasswordFields(records: MutationRecord[]): void {
+  for (const record of records) {
+    if (wasPasswordType(record.oldValue)) revealedPasswordFields.add(record.target);
+  }
+}
 
 function setSnippets(newSnippets: Snippet[]): void {
   snippets = newSnippets;
@@ -60,7 +73,9 @@ function expandTarget(target: EventTarget | null): string | undefined {
 function isTextControl(target: EventTarget | null): target is HTMLInputElement | HTMLTextAreaElement {
   const isControl =
     target instanceof HTMLTextAreaElement || (target instanceof HTMLInputElement && supportsInputType(target.type));
-  return isControl && !isSensitiveAutocomplete(target.getAttribute("autocomplete"));
+  return (
+    isControl && !revealedPasswordFields.has(target) && !isSensitiveAutocomplete(target.getAttribute("autocomplete"))
+  );
 }
 
 function isContentEditable(target: EventTarget | null): target is HTMLElement {

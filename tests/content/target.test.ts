@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isSensitiveAutocomplete, mightCompleteShortcut, supportsInputType } from "../../src/content/target";
+import { isSensitiveAutocomplete, mightCompleteShortcut, supportsInputType, wasPasswordType } from "../../src/content/target";
 
 describe("supportsInputType", () => {
   it.each(["text", "search", "email", "url", "tel"])(
@@ -16,6 +16,17 @@ describe("supportsInputType", () => {
       expect(supportsInputType(type)).toBe(false);
     },
   );
+});
+
+describe("wasPasswordType", () => {
+  it("detecta un campo de contraseña que se acaba de mostrar", () => {
+    expect(wasPasswordType("password")).toBe(true);
+    expect(wasPasswordType(" PASSWORD ")).toBe(true);
+  });
+
+  it.each([null, "", "text", "email", "search"])("no marca campos que antes eran type=%s", (previousType) => {
+    expect(wasPasswordType(previousType)).toBe(false);
+  });
 });
 
 describe("isSensitiveAutocomplete", () => {

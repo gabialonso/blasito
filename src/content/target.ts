@@ -4,6 +4,11 @@ export function supportsInputType(type: string): boolean {
   return SUPPORTED_INPUT_TYPES.has(type);
 }
 
+/** true when a field's previous `type` was password, so a "show password" toggle just revealed it. */
+export function wasPasswordType(previousType: string | null): boolean {
+  return previousType?.trim().toLowerCase() === "password";
+}
+
 // many secret fields are type=text (a revealed password, a one-time code, a card number),
 // so the autocomplete hint is the only sign left that the field holds a secret.
 const SENSITIVE_AUTOCOMPLETE = new Set([
