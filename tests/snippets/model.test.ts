@@ -120,15 +120,29 @@ describe("snippet lifecycle", () => {
 
 describe("parseStoredSnippets", () => {
   it("usa una lista vacía cuando aún no hay datos", () => {
-    expect(parseStoredSnippets(undefined)).toEqual([]);
+    expect(parseStoredSnippets(undefined)).toEqual({ snippets: [], unreadable: [] });
   });
 
-  it("rechaza datos corruptos sin convertirlos silenciosamente", () => {
-    expect(() => parseStoredSnippets([{ shortcut: "/sin-id" }])).toThrow(t().unreadableStorage);
+  it("rechaza datos que no son una lista", () => {
+    expect(() => parseStoredSnippets({ shortcut: "/hello" })).toThrow(t().unreadableStorage);
   });
 
   it("acepta snippets completos", () => {
-    expect(parseStoredSnippets([existing])).toEqual([existing]);
+    expect(parseStoredSnippets([existing])).toEqual({ snippets: [existing], unreadable: [] });
+  });
+
+  it("separa las filas ilegibles sin bloquear las que sí sirven", () => {
+    const broken = [{ shortcut: 123 }, null, "texto suelto"];
+    expect(parseStoredSnippets([broken[0], existing, broken[1], broken[2]])).toEqual({
+      snippets: [existing],
+      unreadable: broken,
+    });
+  });
+
+  it("guarda las filas ilegibles tal cual, sin convertirlas", () => {
+    const broken = { ...existing, updatedAt: 42 };
+    const { unreadable } = parseStoredSnippets([broken]);
+    expect(unreadable[0]).toBe(broken);
   });
 });
 

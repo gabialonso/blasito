@@ -1,5 +1,5 @@
 import { t } from "../shared/i18n";
-import type { ImportResult, Snippet, SnippetDraft } from "./types";
+import type { ImportResult, Snippet, SnippetDraft, StoredSnippets } from "./types";
 
 /** a draft that can't be saved, with the field that needs fixing. */
 export class ValidationError extends Error {
@@ -62,16 +62,26 @@ export function updateSnippet(
   };
 }
 
-export function parseStoredSnippets(value: unknown): Snippet[] {
+/**
+ * one bad row must not lock the user out of the rest, so valid snippets are returned and
+ * unreadable rows are set aside untouched (they may come from a newer version or a manual edit).
+ */
+export function parseStoredSnippets(value: unknown): StoredSnippets {
   if (value === undefined) {
-    return [];
+    return { snippets: [], unreadable: [] };
   }
 
-  if (!Array.isArray(value) || !value.every(isSnippet)) {
+  if (!Array.isArray(value)) {
     throw new Error(t().unreadableStorage);
   }
 
-  return value;
+  const snippets: Snippet[] = [];
+  const unreadable: unknown[] = [];
+  for (const item of value) {
+    if (isSnippet(item)) snippets.push(item);
+    else unreadable.push(item);
+  }
+  return { snippets, unreadable };
 }
 
 export function filterSnippets(snippets: Snippet[], query: string): Snippet[] {
