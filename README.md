@@ -79,7 +79,7 @@ A JSON array, or the same array inside a `snippets` property. `shortcut` and `co
 
 ## Privacy
 
-Everything stays on your device, in the browser's local extension storage (`storage.local`). Blasito makes no network requests and only asks for the `storage` permission. See [PRIVACY.md](PRIVACY.md) for the details.
+Everything stays on your device, in the browser's local extension storage (`storage.local`). Blasito makes no network requests, and `storage` is its only permission. Its content script runs on every site so shortcuts work anywhere, which is why the browser asks at install for access to your data on all websites. See [PRIVACY.md](PRIVACY.md) for the details.
 
 ## Development
 

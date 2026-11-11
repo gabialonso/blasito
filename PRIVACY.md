@@ -1,21 +1,21 @@
 # Privacy policy
 
-_Last updated: 2026-11-01_
+_Last updated: 2026-11-10_
 
 Blasito is a text expander that runs entirely in your browser. It has no servers, no accounts and no analytics.
 
 ## What Blasito stores
 
-- **Your snippets** (shortcut, text and optional name) and their creation dates, in the browser's local extension storage (`storage.local`), on your device. They are not synced and never leave the browser unless you export them. They are stored as plain text, without encryption, so anyone with access to your browser profile can read them. Don't save passwords or secrets as snippets.
+- **Your snippets** (shortcut, text and optional name), with an internal ID and the dates they were created and last edited, in the browser's local extension storage (`storage.local`), on your device. They are not synced and never leave the browser unless you export them. They are stored as plain text, without encryption, so anyone with access to your browser profile can read them. Don't save passwords or secrets as snippets.
 - **Your preferences:** the interface language and the editor width, in the extension's own `localStorage`.
 
 ## What Blasito reads
 
-To expand a shortcut, the content script looks at the text right before the cursor in the text field you are typing in (`input`, `textarea` or editable areas). This happens locally, only when the last typed character could finish one of your shortcuts. Password, number, date and other non-text fields are ignored before anything typed in them is looked at. Nothing you type is stored, logged or sent anywhere.
+To expand a shortcut, the content script looks at the text before the cursor in the text field you are typing in (`input`, `textarea` or editable areas). In editable areas, such as the rich text editors of email and chat sites, that is all the text before the cursor in the editor. While you type, this only happens when the last character could finish one of your shortcuts; when the browser doesn't report what was inserted (which can happen when you paste or drop text, press Enter or use an input method editor), it happens every time. All of this runs locally. Password, number, date and other non-text fields are ignored before anything typed in them is looked at. Nothing you type is stored, logged or sent anywhere.
 
 ## What Blasito sends
 
-Nothing. The extension makes no network requests and loads no remote code. Its fonts are bundled. The extension pages (popup and options) also carry a content security policy that blocks network connections.
+Nothing. The extension makes no network requests and loads no remote code. Its fonts are bundled. The extension pages (popup and options) also carry a content security policy (`connect-src 'none'`) that stops their scripts from opening network connections.
 
 ## Clipboard and files
 
@@ -27,7 +27,7 @@ Nothing. The extension makes no network requests and loads no remote code. Its f
 | Permission | Why |
 | --- | --- |
 | `storage` | Save your snippets on your device. |
-| Content script on all sites | Detect shortcuts in any text field you type in. |
+| Content script on all sites | Detect shortcuts in any text field you type in. This is why the browser asks at install for access to your data on all websites. |
 
 ## Removing your data
 
